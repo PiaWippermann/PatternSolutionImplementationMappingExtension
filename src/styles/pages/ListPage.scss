@@ -1,0 +1,99 @@
+@use "../base/variables" as *;
+
+.list-container {
+  background-color: #fff;
+  width: 100vw;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid $border-color;
+  padding: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.3em;
+  font-weight: 700;
+  color: $text-color;
+  margin: 0;
+}
+
+.title-icon {
+  height: 50px;
+  width: 50px;
+  margin-right: 12px;
+}
+
+.create-button {
+  background-color: #fff;
+  color: $primary-color;
+  border: 1px solid $primary-color;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.create-button:hover {
+  background-color: $primary-color;
+  color: #fff;
+}
+
+.list-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  overflow-y: scroll;
+  padding: 0px 0px 24px 0px;
+
+  li {
+    list-style: none;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.list-item {
+  background-color: #fff;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  margin: 0 24px;
+  z-index: 10;
+}
+
+.list-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.item-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: $text-color;
+}
+
+.pagination-container {
+  margin: 16px 24px;
+}

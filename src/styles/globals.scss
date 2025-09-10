@@ -1,0 +1,21 @@
+@use "./base/variables" as *;
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Inter", sans-serif;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.separator {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 8px;
+  margin-top: 8px;
+}

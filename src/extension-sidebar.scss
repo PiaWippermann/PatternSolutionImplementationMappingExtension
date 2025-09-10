@@ -1,0 +1,24 @@
+.extension-sidebar {
+    position: fixed;
+    /* Hält die Seitenleiste an einer festen Position */
+    top: 0;
+    /* Richte sie am oberen Rand aus */
+    right: 0;
+    /* Richte sie am rechten Rand aus */
+    width: 350px;
+    /* Breite der Seitenleiste */
+    height: 100%;
+    /* Volle Höhe des Viewports */
+    background-color: #f0f2f5;
+    /* Hintergrundfarbe */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    /* Schatten zur Abhebung vom Inhalt */
+    z-index: 1000;
+    /* Stellt sicher, dass die Seitenleiste über dem Seiteninhalt liegt */
+    overflow-y: auto;
+    /* Fügt einen Scrollbalken hinzu, falls der Inhalt zu lang ist */
+    padding: 10px;
+    border-left: 1px solid #ddd;
+    box-sizing: border-box;
+    /* Stellt sicher, dass Padding in die Breite einbezogen wird */
+}

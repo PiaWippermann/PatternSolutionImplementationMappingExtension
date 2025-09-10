@@ -1,0 +1,48 @@
+@use "../styles/base/variables" as *;
+
+.spinnerContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 80px;
+}
+
+.dot1,
+.dot2,
+.dot3 {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin: 0 5px;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot1 {
+    background-color: $primary-color;
+    animation-delay: -0.32s;
+}
+
+.dot2 {
+    background-color: $secondary-color;
+    animation-delay: -0.16s;
+}
+
+.dot3 {
+    background-color: $tertiary-color;
+    animation-delay: 0s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0); // Startet klein
+    }
+
+    40% {
+        transform: scale(1); // Wird groß
+    }
+}
