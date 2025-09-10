@@ -54,6 +54,13 @@
   color: #fff;
 }
 
+.create-button:disabled {
+  background-color: $border-color;
+  color: $text-color;
+  border-color: $border-color;
+  cursor: not-allowed;
+}
+
 .list-content {
   display: flex;
   flex-direction: column;

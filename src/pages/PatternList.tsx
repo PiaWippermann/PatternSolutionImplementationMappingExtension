@@ -6,12 +6,15 @@ import type { ListData } from '../types/DiscussionData';
 import '../styles/pages/ListPage.scss';
 import patternIconUrl from '../assets/patterns.svg';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface PatternListProps {
   onSelectPattern: (number: number) => void;
+  onAddPattern?: () => void;
 }
 
-const PatternList: React.FC<PatternListProps> = ({ onSelectPattern }) => {
+const PatternList: React.FC<PatternListProps> = ({ onSelectPattern, onAddPattern }) => {
   const { loading, error, ids, fetchDiscussionList } = useDiscussionData();
 
   const [patterns, setPatterns] = useState<SimpleDiscussion[]>([]);
@@ -79,6 +82,7 @@ const PatternList: React.FC<PatternListProps> = ({ onSelectPattern }) => {
           <img src={patternIconUrl} className="title-icon" alt="Patterns Icon" />
           Patterns
         </h1>
+        <button onClick={onAddPattern} className="create-button"><FontAwesomeIcon icon={faPlus} /></button>
       </div>
 
       {content}

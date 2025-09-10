@@ -50,7 +50,7 @@ const PatternDetail: React.FC<PatternDetailProps> = ({ patternNumber, onClose })
             <span className="category-name">{patternDetails.category.name}</span>
           </div>
           <div className="item-title">
-            <img src={patternDetails.icon} alt={`${patternDetails.title} Icon`} className="item-icon" />
+            {patternDetails.icon && <img src={patternDetails.icon} alt={`${patternDetails.title} Icon`} className="item-icon" />}
             <span className="title-text">{patternDetails.title}</span>
           </div>
         </div>

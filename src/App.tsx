@@ -3,15 +3,17 @@ import browser from 'webextension-polyfill';
 import './App.scss';
 import "./styles/globals.scss";
 import PatternList from './pages/PatternList';
+import CreatePattern from './pages/CreatePattern';
 import PatternDetail from './pages/PatternDetail';
 import SolutionImplementationList from './pages/SolutionImplementationList';
+import CreateSolution from './pages/CreateSolution';
 import SolutionImplementationDetail from './pages/SolutionImplementationDetail';
 import { DiscussionDataProvider } from './context/DiscussionDataContext';
 import "./styles/layout/AppLayout.scss";
 import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-type View = 'login' | 'patterns' | 'solutionsImplementations' | 'patternDetail' | 'solutionImplementationDetail';
+type View = 'login' | 'patterns' | 'solutionsImplementations' | 'patternDetail' | 'solutionImplementationDetail' | 'createPattern' | 'createSolutionImplementation';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('patterns');
@@ -38,8 +40,12 @@ function App() {
               setSelectedNumber(number);
               setCurrentView('patternDetail');
             }}
+            onAddPattern={() => setCurrentView('createPattern')}
           />
         );
+
+      case 'createPattern':
+        return <CreatePattern onClose={() => setCurrentView('patterns')} />;
 
       case 'solutionsImplementations':
         return (
@@ -48,8 +54,13 @@ function App() {
               setSelectedNumber(number);
               setCurrentView('solutionImplementationDetail');
             }}
+            onAddSolutionImplementation={() => setCurrentView('createSolutionImplementation')}
           />
         );
+
+      case 'createSolutionImplementation':
+        return (
+          <CreateSolution onClose={() => setCurrentView('solutionsImplementations')} />);
 
       case 'solutionImplementationDetail':
         return selectedNumber !== null ? (

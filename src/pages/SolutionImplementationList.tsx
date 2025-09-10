@@ -6,12 +6,15 @@ import type { ListData } from '../types/DiscussionData';
 import '../styles/pages/ListPage.scss';
 import solutionImplementationIconUrl from '../assets/solutionImplementations.svg';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 interface SolutionImplementationListProps {
     onSelectSolution: (number: number) => void;
+    onAddSolutionImplementation?: () => void;
 }
 
-const SolutionImplementationList: React.FC<SolutionImplementationListProps> = ({ onSelectSolution }) => {
+const SolutionImplementationList: React.FC<SolutionImplementationListProps> = ({ onSelectSolution, onAddSolutionImplementation }) => {
     const { loading, error, ids, fetchDiscussionList } = useDiscussionData();
 
     const [solutionImplementations, setSolutionImplementations] = useState<SimpleDiscussion[]>([]);
@@ -79,7 +82,7 @@ const SolutionImplementationList: React.FC<SolutionImplementationListProps> = ({
                     <img src={solutionImplementationIconUrl} className="title-icon" alt="SolutionImplementations Icon" />
                     Solution Implementations
                 </h1>
-                {/* <button onClick={() => navigate('/solutionImplementations/create')} className="create-button">Create New SolutionImplementation</button> */}
+                <button onClick={onAddSolutionImplementation} className="create-button"><FontAwesomeIcon icon={faPlus} /></button>
             </div>
 
             {content}

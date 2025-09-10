@@ -127,3 +127,53 @@ footer {
     padding: 16px 24px 0px;
     border-top: 1px solid $border-color;
 }
+
+// ... (bestehende Styles bleiben unverändert)
+
+.creation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 0;
+
+    .input-field-container {
+        display: flex;
+        gap: 8px;
+        position: relative;
+        background-color: $background-color;
+        border-radius: 20px;
+        padding: 10px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid $border-color;
+        margin-bottom: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 16px;
+        gap: 8px;
+        margin-bottom: 0;
+    }
+
+    label {
+        font-weight: 600;
+        color: $text-color;
+        font-size: 0.8rem;
+    }
+}
+
+.custom-input,
+.custom-textarea {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    resize: none;
+    padding: 8px 0;
+    font-family: inherit;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: $text-color;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    padding: 0;
+}
