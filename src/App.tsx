@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import browser from 'webextension-polyfill';
 import './App.scss';
 import "./styles/globals.scss";
+import Search from './pages/Search';
 import PatternList from './pages/PatternList';
 import CreatePattern from './pages/CreatePattern';
 import PatternDetail from './pages/PatternDetail';
@@ -10,10 +11,11 @@ import CreateSolution from './pages/CreateSolution';
 import SolutionImplementationDetail from './pages/SolutionImplementationDetail';
 import { DiscussionDataProvider } from './context/DiscussionDataContext';
 import "./styles/layout/AppLayout.scss";
-import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
+// import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
-type View = 'login' | 'patterns' | 'solutionsImplementations' | 'patternDetail' | 'solutionImplementationDetail' | 'createPattern' | 'createSolutionImplementation';
+type View = 'login' | 'patterns' | 'solutionsImplementations' | 'patternDetail' | 'solutionImplementationDetail' | 'createPattern' | 'createSolutionImplementation' | 'search';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('patterns');
@@ -84,6 +86,15 @@ function App() {
 
       case 'login':
         return <p>Login View (to be implemented)</p>;
+
+      case 'search':
+        return (
+          <Search onClose={() => setCurrentView('patterns')} onDiscussionSelected={(result) => {
+            setSelectedNumber(result.discussionNumber);
+            setCurrentView(result.viewName as View);
+          }} />
+        );
+
       default:
         return null;
     }
@@ -114,16 +125,21 @@ function App() {
               >
                 Solution Implementations
               </button>
+              <button
+                onClick={() => setCurrentView('search')}
+              >
+                <FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#49454f" }} />
+              </button>
             </nav>
           </div>
-          <div className="headerRight">
+          {/*  <div className="headerRight">
             <button className="userMenu">
               <FontAwesomeIcon
                 icon={faBars}
                 style={{ color: "#49454f" }}
               />
             </button>
-          </div>
+          </div> */}
         </header>
         {renderView()}
       </div>

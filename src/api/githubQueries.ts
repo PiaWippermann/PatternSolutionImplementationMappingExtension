@@ -268,6 +268,38 @@ const GET_DISCUSSION_COMMENTS_QUERY = gql`
 }
 `;
 
+const SEARCH_DISCUSSIONS_QUERY = gql`
+  query SearchDiscussions($queryString: String!, $first: Int!, $after: String) {
+    search(
+      query: $queryString
+      type: DISCUSSION
+      first: $first
+      after: $after
+    ) {
+      discussionCount
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        ... on Discussion {
+          id
+          title
+          number
+          url
+          repository {
+            nameWithOwner
+          }
+          category {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
 /**
  * Gets a paginated list of discussions for a given category.
  * This category can be either referred to as "Patterns" or "Realizations".
@@ -482,3 +514,48 @@ export const fetchAllSolutionsBody = async (categoryId: string) => {
 
   return allDiscussions;
 }
+
+/**
+ * Searches for discussions based on a search string, excluding the mapping category.
+ * @param searchString The search term provided by the user.
+ * @param after The cursor for pagination.
+ * @param first The number of results to return.
+ * @param repoName The name of the repository.
+ * @param mappingCategoryName The name of the category to exclude.
+ * @returns A list of matching discussions and pagination info.
+ */
+export const searchDiscussions = async (
+  searchString: string,
+  first: number,
+  repoName: string,
+  mappingCategoryName: string,
+  after?: string | null
+) => {
+  const fullQueryString = `repo:${owner}/${repoName} -category:"${mappingCategoryName}" ${searchString}`;
+
+  const variables = {
+    queryString: fullQueryString,
+    first,
+    after,
+  };
+
+  const data = await client.request<{
+    search: {
+      discussionCount: number;
+      pageInfo: {
+        endCursor: string;
+        hasNextPage: boolean;
+      };
+      nodes: {
+        id: string;
+        title: string;
+        number: number;
+        url: string;
+        repository: { nameWithOwner: string };
+        category: { id: string; name: string };
+      }[];
+    };
+  }>(SEARCH_DISCUSSIONS_QUERY, variables);
+
+  return data.search;
+};
