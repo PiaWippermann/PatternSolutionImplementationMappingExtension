@@ -38,6 +38,47 @@
   margin-right: 12px;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.refresh-button {
+  background-color: #fff;
+  color: $primary-color;
+  border: 1px solid $primary-color;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.refresh-button:hover:not(:disabled) {
+  background-color: $primary-color;
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.refresh-button:active:not(:disabled) {
+  transform: rotate(180deg);
+}
+
+.refresh-button:disabled {
+  background-color: $border-color;
+  color: $text-light;
+  border-color: $border-color;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .create-button {
   background-color: #fff;
   color: $primary-color;

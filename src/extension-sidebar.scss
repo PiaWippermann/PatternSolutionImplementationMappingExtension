@@ -1,24 +1,41 @@
+@use "./styles/base/variables" as *;
+
 .extension-sidebar {
     position: fixed;
-    /* Hält die Seitenleiste an einer festen Position */
     top: 0;
-    /* Richte sie am oberen Rand aus */
     right: 0;
-    /* Richte sie am rechten Rand aus */
     width: 350px;
-    /* Breite der Seitenleiste */
     height: 100%;
-    /* Volle Höhe des Viewports */
     background-color: #f0f2f5;
-    /* Hintergrundfarbe */
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
-    /* Schatten zur Abhebung vom Inhalt */
     z-index: 1000;
-    /* Stellt sicher, dass die Seitenleiste über dem Seiteninhalt liegt */
     overflow-y: auto;
-    /* Fügt einen Scrollbalken hinzu, falls der Inhalt zu lang ist */
     padding: 10px;
     border-left: 1px solid #ddd;
     box-sizing: border-box;
-    /* Stellt sicher, dass Padding in die Breite einbezogen wird */
+}
+
+.back-button {
+    background: none;
+    border: 1px solid $border-color;
+    border-radius: 24px;
+    padding: 8px 16px;
+    align-self: flex-start;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $text-color;
+    font-weight: 600;
+
+    &:hover {
+        background-color: $background-color;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+}
+
+.back-button-text {
+    display: inline-block;
+    vertical-align: middle;
 }

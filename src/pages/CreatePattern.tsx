@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createPattern } from "../api/githubPatterns";
+import { createPattern } from "../api";
 import "../styles/pages/DetailPage.scss";
 import { useDiscussionData } from "../context/DiscussionDataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,16 +33,6 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
     setIsSubmitting(true);
 
     if (isSubmitting) {
-      return;
-    }
-
-    if (!repositoryId || !patternCategoryId) {
-      alert("Repository ID or Category ID is missing.");
-      return;
-    }
-
-    if (!title || !description || !referenceUrl) {
-      alert("Please fill in all required fields.");
       return;
     }
 
@@ -102,7 +92,6 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
                 className="custom-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                required
               />
             </div>
 
@@ -113,7 +102,6 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
                 type="string"
                 value={referenceUrl}
                 onChange={(e) => setReferenceUrl(e.target.value)}
-                required
               />
             </div>
 

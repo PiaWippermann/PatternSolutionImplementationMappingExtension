@@ -133,47 +133,53 @@ footer {
 .creation-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     padding: 16px 0;
 
     .input-field-container {
         display: flex;
-        gap: 8px;
-        position: relative;
-        background-color: $background-color;
-        border-radius: 20px;
-        padding: 10px;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        border: 1px solid $border-color;
-        margin-bottom: 1.5rem;
         flex-direction: column;
         align-items: flex-start;
-        padding: 10px 16px;
         gap: 8px;
         margin-bottom: 0;
     }
 
     label {
+        display: block;
         font-weight: 600;
         color: $text-color;
-        font-size: 0.8rem;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
     }
 }
 
 .custom-input,
 .custom-textarea {
-    flex-grow: 1;
-    border: none;
-    background: transparent;
-    outline: none;
-    resize: none;
-    padding: 8px 0;
-    font-family: inherit;
-    font-size: 0.8rem;
-    line-height: 1.4;
-    color: $text-color;
     width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid $border-color;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: white;
+    color: $text-color;
+    font-family: inherit;
     box-sizing: border-box;
-    font-size: 0.9rem;
-    padding: 0;
+
+    &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+
+    &::placeholder {
+        color: $text-light;
+        opacity: 0.6;
+    }
+}
+
+.custom-textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
 }

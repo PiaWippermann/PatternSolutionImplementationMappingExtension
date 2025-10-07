@@ -1,0 +1,232 @@
+@use '../base/variables' as *;
+@use 'sass:color';
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: white;
+}
+
+.login-card {
+  background: $card-background;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-header {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-color 100%);
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+
+  .github-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: $font-weight;
+  }
+
+  .login-subtitle {
+    margin: 0.2rem 0 0 0;
+    opacity: 0.9;
+    font-size: 0.8rem;
+  }
+}
+
+.login-body {
+  padding: 2rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.info-section {
+  background: $background-color;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid $border-color;
+
+  h3 {
+    margin: 0 0 1rem 0;
+    color: $text-color;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .info-icon {
+      color: $primary-color;
+    }
+  }
+
+  .instructions-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: $text-light;
+    line-height: 1.8;
+
+    li {
+      margin-bottom: 0.75rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    a {
+      color: $primary-color;
+      text-decoration: none;
+      font-weight: $font-weight;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    code {
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+  }
+
+  .scopes-list {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.login-form {
+  .input-field-container {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: $text-color;
+      font-weight: $font-weight;
+      font-size: 0.95rem;
+    }
+
+    .token-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .token-input {
+        flex: 1;
+        padding-right: 3rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+      }
+
+      .toggle-visibility-button {
+        position: absolute;
+        right: 0.75rem;
+        background: none;
+        border: none;
+        color: $text-light;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $primary-color;
+        }
+
+        &:focus {
+          outline: none;
+          color: $primary-color;
+        }
+      }
+    }
+  }
+
+  .error-message {
+    background: rgba($primary-color, 0.1);
+    border: 1px solid $primary-color;
+    color: color.adjust($primary-color, $lightness: -15%);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 1rem;
+    background: $primary-color;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: $font-weight;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+
+    &:hover:not(:disabled) {
+      background: color.adjust($primary-color, $lightness: -10%);
+      box-shadow: $hover-shadow;
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      background: $disabled-color;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &:focus {
+      outline: 2px solid $primary-color;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// Custom input styling (consistent with existing forms)
+.custom-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid $border-color;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+  color: $text-color;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+
+  &::placeholder {
+    color: color.adjust($text-light, $lightness: 20%);
+  }
+}

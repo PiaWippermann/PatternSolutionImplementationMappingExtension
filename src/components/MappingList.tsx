@@ -6,7 +6,7 @@ import type { Comment } from '../types/GitHub';
 import CommentCreator from './CommentCreator';
 import styles from './MappingList.module.scss';
 import LoadingSpinner from './LoadingSpinner';
-import { fetchDiscussionComments } from '../api/githubQueries';
+import { fetchDiscussionComments } from '../api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronUp, faChevronDown, faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 

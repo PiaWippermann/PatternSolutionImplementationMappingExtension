@@ -5,10 +5,15 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { parsePatternBody } from "../api/githubPatterns";
-import { parseSolutionBody } from "../api/githubSolutions";
-import { parseMappingBody } from "../api/githubMappings";
-import { getRepositoryIds, getDiscussionsListData, getDiscussionDetails } from "../api/githubQueries";
+import { 
+  getRepositoryIds, 
+  getDiscussionsListData, 
+  getDiscussionDetails,
+  parsePattern,
+  parseSolution,
+  parseMapping
+} from "../api";
+import { PAGE_SIZE } from "../config";
 import type {
   DiscussionData,
   RepositoryIds,
@@ -30,6 +35,7 @@ type DiscussionDataContextType = {
   addOrUpdatePatternData: (newPattern: Pattern) => void;
   addOrUpdateSolutionImplementationData: (newSolutionImplementation: SolutionImplementation) => void;
   addOrUpdateMappingData: (newMapping: PatternSolutionMapping) => void;
+  clearListCache: (type: 'patterns' | 'solutionImplementations') => void;
   ids: RepositoryIds;
   loading: boolean;
   error: string | null;
@@ -56,6 +62,7 @@ const DiscussionDataContext = createContext<DiscussionDataContextType>({
   addOrUpdatePatternData: () => { },
   addOrUpdateSolutionImplementationData: () => { },
   addOrUpdateMappingData: () => { },
+  clearListCache: () => { },
   ids: {
     repositoryId: "",
     solutionImplementationCategoryId: "",
@@ -65,9 +72,6 @@ const DiscussionDataContext = createContext<DiscussionDataContextType>({
   loading: true,
   error: null,
 });
-
-// Define constants for pagination and category IDs
-const PAGE_SIZE = 10; // Number of items per page
 
 // Custom hook to use the DiscussionDataContext
 export const useDiscussionData = () => useContext(DiscussionDataContext);
@@ -186,14 +190,7 @@ export const DiscussionDataProvider: React.FC<{
       }
       // Based on the type the response body needs to be parsed and the details stored in the correct array
       if (type === "patterns") {
-        const patternData = parsePatternBody(response.body);
-        const fullPatternData: Pattern = {
-          ...response,
-          icon: patternData.icon || "",
-          description: patternData.description || "",
-          patternRef: patternData.patternRef || "",
-          mappings: patternData.mappings || [],
-        };
+        const fullPatternData = parsePattern(response);
 
         setDiscussionData(prevData => ({
           ...prevData,
@@ -205,13 +202,7 @@ export const DiscussionDataProvider: React.FC<{
 
         return fullPatternData;
       } else if (type === "solutionImplementations") {
-        const solutionData = parseSolutionBody(response.body);
-        const fullSolutionData: SolutionImplementation = {
-          ...response,
-          solutionRefUrl: solutionData.solutionRefUrl || "",
-          description: solutionData.description || "",
-          mappings: solutionData.mappings || [],
-        };
+        const fullSolutionData = parseSolution(response);
 
         setDiscussionData(prevData => ({
           ...prevData,
@@ -251,18 +242,12 @@ export const DiscussionDataProvider: React.FC<{
         return;
       }
 
-      const mappingData = parseMappingBody(response.body);
+      const fullMappingData = parseMapping(response);
 
-      if (!mappingData.patternDiscussionNumber || !mappingData.solutionImplementationDiscussionNumber) {
+      if (!fullMappingData.patternDiscussionNumber || !fullMappingData.solutionImplementationDiscussionNumber) {
         // Mapping discussion body is not in the right format, ignore this discussion
         return;
       }
-
-      const fullMappingData: PatternSolutionMapping = {
-        ...response,
-        patternDiscussionNumber: parseInt(mappingData.patternDiscussionNumber),
-        solutionImplementationDiscussionNumber: parseInt(mappingData.solutionImplementationDiscussionNumber)
-      };
 
       setDiscussionData(prevData => ({
         ...prevData,
@@ -491,6 +476,18 @@ export const DiscussionDataProvider: React.FC<{
     }
   };
 
+  // Clear list cache for a specific type to force reload
+  const clearListCache = (type: 'patterns' | 'solutionImplementations') => {
+    setDiscussionData(prevData => ({
+      ...prevData,
+      [type]: {
+        ...prevData[type],
+        listData: {},
+        currentPageCursor: null,
+      },
+    }));
+  };
+
   // fetch repo ids on mount
   useEffect(() => {
     fetchRepoIds();
@@ -499,7 +496,7 @@ export const DiscussionDataProvider: React.FC<{
   return (
     <DiscussionDataContext.Provider
       value={{
-        ids, loading, error, discussionData, fetchDiscussionList, fetchDiscussionDetailsByNumber, fetchMappingDiscussionByNumber, addOrUpdatePatternData, addOrUpdateSolutionImplementationData, addOrUpdateMappingData
+        ids, loading, error, discussionData, fetchDiscussionList, fetchDiscussionDetailsByNumber, fetchMappingDiscussionByNumber, addOrUpdatePatternData, addOrUpdateSolutionImplementationData, addOrUpdateMappingData, clearListCache
       }}
     >
       {children}

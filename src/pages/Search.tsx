@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { searchDiscussions } from "../api/githubQueries";
+import { searchDiscussions } from "../api/queries/discussions";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { faAnglesLeft } from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -34,9 +34,6 @@ const Search: React.FC<SearchProps> = ({ onClose, onDiscussionSelected }) => {
         setError(null);
         setSearchResults(null);
 
-        const repoName = "GitHubDiscussionsTesting";
-        const mappingCategoryName = "Pattern - Solution Implementation Mapping";
-
         if (searchTerm.trim() === "") {
             setError("Please enter a search term.");
             setIsLoading(false);
@@ -44,20 +41,17 @@ const Search: React.FC<SearchProps> = ({ onClose, onDiscussionSelected }) => {
         }
 
         try {
-            const data = await searchDiscussions(
-                searchTerm,
-                10,
-                repoName,
-                mappingCategoryName
-            );
+            // Search in all relevant categories
+            const categoryId = ids?.patternSolutionMappingCategoryId || "";
+            const data = await searchDiscussions(searchTerm, categoryId, 20);
 
             console.log("Search results:", data);
 
-            const formattedResults = data.nodes.map(node => ({
+            const formattedResults = data.map(node => ({
                 id: node.id,
                 title: node.title,
                 number: node.number,
-                categoryId: node.category?.id
+                categoryId: categoryId
             }));
 
             setSearchResults(formattedResults);

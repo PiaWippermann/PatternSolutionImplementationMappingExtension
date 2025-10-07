@@ -6,7 +6,7 @@ import type { ListData } from '../types/DiscussionData';
 import '../styles/pages/ListPage.scss';
 import patternIconUrl from '../assets/patterns.svg';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface PatternListProps {
@@ -15,7 +15,7 @@ interface PatternListProps {
 }
 
 const PatternList: React.FC<PatternListProps> = ({ onSelectPattern, onAddPattern }) => {
-  const { loading, error, ids, fetchDiscussionList } = useDiscussionData();
+  const { loading, error, ids, fetchDiscussionList, clearListCache } = useDiscussionData();
 
   const [patterns, setPatterns] = useState<SimpleDiscussion[]>([]);
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
@@ -50,6 +50,16 @@ const PatternList: React.FC<PatternListProps> = ({ onSelectPattern, onAddPattern
     setCurrentPageIndex(prevIndex => prevIndex - 1);
   };
 
+  const handleRefresh = () => {
+    // Clear the cache
+    clearListCache('patterns');
+    // Reset pagination to first page
+    setPageHistory([null]);
+    setCurrentPageIndex(0);
+    setPatterns([]);
+    setPageInfo(null);
+  };
+
   let content;
   if (loading && patterns.length === 0) {
     content = <LoadingSpinner />;
@@ -82,7 +92,12 @@ const PatternList: React.FC<PatternListProps> = ({ onSelectPattern, onAddPattern
           <img src={patternIconUrl} className="title-icon" alt="Patterns Icon" />
           Patterns
         </h1>
-        <button onClick={onAddPattern} className="create-button"><FontAwesomeIcon icon={faPlus} /></button>
+        <div className="header-buttons">
+          <button onClick={handleRefresh} className="refresh-button" disabled={loading} title="Refresh list">
+            <FontAwesomeIcon icon={faArrowsRotate} />
+          </button>
+          <button onClick={onAddPattern} className="create-button"><FontAwesomeIcon icon={faPlus} /></button>
+        </div>
       </div>
 
       {content}

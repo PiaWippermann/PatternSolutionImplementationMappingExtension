@@ -4,17 +4,31 @@ import type { SolutionImplementation, PatternSolutionMapping, Pattern } from './
 import LoadingSpinner from './components/LoadingSpinner';
 import Pagination from './components/Pagination';
 import browser from 'webextension-polyfill';
-import { getDiscussionDetails, fetchDiscussionComments, getDiscussionsListData } from "./api/githubQueries";
-import { parseSolutionBody } from './api/githubSolutions';
-import { parseMappingBody, createMapping } from './api/githubMappings';
-import { parsePatternBody } from './api/githubPatterns';
+import { 
+  getDiscussionDetails, 
+  fetchDiscussionComments, 
+  getDiscussionsListData,
+  parseSolution,
+  parseMapping,
+  createMapping,
+  parsePattern
+} from "./api";
 import type { BaseDiscussion, Comment, SimpleDiscussion, PageInfo } from './types/GitHub';
 import CommentComponent from './components/Comment';
 import CommentCreator from './components/CommentCreator';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faChevronLeft, faChevronRight, faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import styles from './components/MappingList.module.scss';
 import sidebarStyles from './components/Sidebar.module.scss';
+
+/**
+ * Checks if the user is authenticated by verifying if a token exists in storage.
+ * @returns True if authenticated, false otherwise.
+ */
+async function checkAuth(): Promise<boolean> {
+    const { githubToken } = await browser.storage.local.get('githubToken') as { githubToken?: string };
+    return !!githubToken;
+}
 
 // ExtensionIntegration is a functional component that handles fetching and rendering
 const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplementationNumber: number }) => {
@@ -56,19 +70,12 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
                     return;
                 }
 
-                const parsedSolutionBody = parseSolutionBody(solutionDiscussion.body);
-                if (!parsedSolutionBody) {
+                const solutionDetails = parseSolution(solutionDiscussion);
+                if (!solutionDetails) {
                     console.error("Failed to parse solution body.");
                     setIsLoading(false);
                     return;
                 }
-
-                const solutionDetails: SolutionImplementation = {
-                    ...solutionDiscussion,
-                    solutionRefUrl: parsedSolutionBody.solutionRefUrl || "",
-                    description: parsedSolutionBody.description || "",
-                    mappings: parsedSolutionBody.mappings || [],
-                };
 
                 // Check if the solutionDetails are already included in the state
                 if (solutionImplementationDetails?.number !== solutionDetails.number) {
@@ -89,19 +96,14 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
 
                 // Fetch all patterns in parallel
                 const patternPromises = mappingResults.map(mappingDetails => {
-                    const mappingBody = mappingDetails ? parseMappingBody(mappingDetails.body) : null;
-                    const patternNumber = mappingBody?.patternDiscussionNumber ? parseInt(mappingBody.patternDiscussionNumber) : null;
+                    const mappingData = mappingDetails ? parseMapping(mappingDetails) : null;
+                    const patternNumber = mappingData?.patternDiscussionNumber;
                     return patternNumber ? getDiscussionDetails(patternNumber) : Promise.resolve(null);
                 });
                 const patternResults = await Promise.all(patternPromises);
 
                 const newMappingDiscussions = mappingResults.filter(Boolean).map((mappingDetails: any) => {
-                    const parsedBody = parseMappingBody(mappingDetails.body);
-                    return {
-                        ...mappingDetails,
-                        patternDiscussionNumber: parseInt(parsedBody.patternDiscussionNumber),
-                        solutionImplementationDiscussionNumber: parseInt(parsedBody.solutionImplementationDiscussionNumber),
-                    };
+                    return parseMapping(mappingDetails);
                 });
 
                 console.log("Parsed mapping discussions:", newMappingDiscussions);
@@ -111,15 +113,9 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
                 patternResults.forEach((patternDetails: any, index) => {
                     const mappingNumber = mappingNumbers[index];
                     if (patternDetails) {
-                        const parsedBody = parsePatternBody(patternDetails.body);
+                        const parsedPattern = parsePattern(patternDetails);
                         newPatternDetails[mappingNumber] = {
-                            details: {
-                                ...patternDetails,
-                                icon: parsedBody.icon || "",
-                                description: parsedBody.description || "",
-                                patternRef: parsedBody.patternRef || "",
-                                mappings: parsedBody.mappings || [],
-                            },
+                            details: parsedPattern,
                             isVisible: false,
                         };
                     }
@@ -137,14 +133,9 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
     // Use effect that is triggered when entering or exiting the "add mapping" mode
     useEffect(() => {
         if (isInAddMappingMode) {
-            // Reset pagination state when entering add mapping mode
-            setListPageHistory([null]);
-            setCurrentListPageIndex(0);
-            setPatternMappingOptionList([]);
-            setListPageInfo(null);
             onLoadPatternOptions();
         }
-    }, [isInAddMappingMode]);
+    }, [isInAddMappingMode, currentListPageIndex]);
 
     /**
      * Handles the click event on a pattern mapping.
@@ -189,9 +180,12 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
      * @returns 
      */
     const onLoadPatternOptions = async () => {
+        setIsLoading(true);
+
         const { repositoryIds: ids } = await browser.storage.local.get('repositoryIds') as { repositoryIds: { patternCategoryId: string; solutionImplementationCategoryId: string; repositoryId: string, patternSolutionMappingCategoryId: string } | null };
         if (!ids || !ids.patternCategoryId) {
             console.error("Failed to retrieve repository IDs or pattern category ID.");
+            setIsLoading(false);
             return;
         }
 
@@ -213,9 +207,12 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
                 // 3. Update the state with the filtered list and pagination info.
                 setPatternMappingOptionList(patternOptions);
                 setListPageInfo(response.pageInfo);
+                console.log("Fetched pattern discussions for mapping options:", patternOptions, response.pageInfo);
             }
         } catch (error) {
             console.error("Failed to fetch pattern discussions:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -245,27 +242,25 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
      * @returns 
      */
     const showPatternDetails = async (patternDiscussionNumber: number) => {
+        setIsLoading(true);
+
         const patternDiscussion = await getDiscussionDetails(patternDiscussionNumber) as BaseDiscussion;
         if (!patternDiscussion) {
             console.error("Failed to fetch pattern discussion details.");
+            setIsLoading(false);
             return;
         }
 
-        const parsedPatternBody = parsePatternBody(patternDiscussion.body);
-        if (!parsedPatternBody) {
+        const patternDetails = parsePattern(patternDiscussion);
+        if (!patternDetails) {
             console.error("Failed to parse pattern body.");
+            setIsLoading(false);
             return;
         }
-
-        const patternDetails: Pattern = {
-            ...patternDiscussion,
-            icon: parsedPatternBody.icon || "",
-            description: parsedPatternBody.description || "",
-            patternRef: parsedPatternBody.patternRef || "",
-            mappings: parsedPatternBody.mappings || [],
-        };
 
         setSelectedPatternOptionDetails(patternDetails);
+
+        setIsLoading(false);
     }
 
     /**
@@ -297,7 +292,10 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
             setPatternDetails(prevDetails => ({
                 ...prevDetails,
                 [response.mapping.number]: {
-                    details: response.updatedPattern,
+                    details: {
+                        ...selectedPatternOptionDetails,
+                        mappings: [...selectedPatternOptionDetails.mappings, response.mapping.number]
+                    },
                     isVisible: true
                 }
             }));
@@ -388,7 +386,11 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
                         <>
                             {/* Show selected pattern details */}
                             <div className={styles.mappingListContainer}>
-                                <h2 className={styles.mappingTitle}>Pattern Details</h2>
+                                <button onClick={() => setSelectedPatternOptionDetails(undefined)} className="back-button">
+                                    <FontAwesomeIcon icon={faAnglesLeft} />
+                                    <span className="back-button-text">Back</span>
+                                </button>
+                                <h3>Pattern Details</h3>
                                 <div className={styles.selectedPatternDetails}>
                                     <img src={selectedPatternOptionDetails.icon} alt={`${selectedPatternOptionDetails.title} Icon`} className={sidebarStyles.icon} />
                                     <h3>{selectedPatternOptionDetails.title}</h3>
@@ -396,17 +398,18 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
                                 </div>
                                 <div className={styles.linkedDetailsContainer}>
                                     <p>{selectedPatternOptionDetails.description}</p>
-                                    <a href={selectedPatternOptionDetails.patternRef} target="_blank" rel="noopener noreferrer">View Pattern</a>
                                 </div>
-                                <button className={styles.createButton} onClick={() => setSelectedPatternOptionDetails(undefined)}>Back to list</button>
-                                <button className={styles.createButton} onClick={() => setIsInAddMappingMode(false)}>Cancel</button>
                             </div>
                         </>
                     ) : isInAddMappingMode ? (
                         <>
                             {/* Add pattern mapping */}
                             <div className={styles.mappingListContainer}>
-                                <h2 className={styles.mappingTitle}>Create a new mapping</h2>
+                                <button onClick={() => setIsInAddMappingMode(false)} className="back-button">
+                                    <FontAwesomeIcon icon={faAnglesLeft} />
+                                    <span className="back-button-text">Back</span>
+                                </button>
+                                <h3>Create a new mapping</h3>
                                 {isLoading && <LoadingSpinner />}
                                 {!isLoading && patternMappingOptionList.length === 0 && <p>No items found.</p>}
                                 {!isLoading && patternMappingOptionList.length > 0 && (
@@ -425,7 +428,6 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
                                     isBackDisabled={currentListPageIndex === 0}
                                     loading={isLoading}
                                 />
-                                <button className={styles.createButton} onClick={() => setIsInAddMappingMode(false)}>Cancel</button>
                             </div>
                         </>
                     ) : (
@@ -504,8 +506,15 @@ const ExtensionIntegration = ({ solutionImplementationNumber }: { solutionImplem
 };
 
 // The main function is the entry point and is called by the background script
-export const main = (solutionImplementationNumber: number) => {
+export const main = async (solutionImplementationNumber: number) => {
     console.log("Content script main function called with solution implementation number:", solutionImplementationNumber);
+
+    // Check if user is authenticated
+    const isAuth = await checkAuth();
+    if (!isAuth) {
+        console.log('User not authenticated. Not rendering component.');
+        return;
+    }
 
     // Check if the container already exists to prevent duplicate execution.
     const existingContainer = document.getElementById('extension-react-root');
@@ -533,9 +542,9 @@ export const main = (solutionImplementationNumber: number) => {
 browser.runtime.sendMessage({ type: 'CONTENT_SCRIPT_READY' });
 
 // Listen for messages from the background script
-browser.runtime.onMessage.addListener((message: any) => {
+browser.runtime.onMessage.addListener(async (message: any) => {
     if (message.type === 'DISCUSSION_NUMBER_MESSAGE' && message.discussionNumber) {
         console.log("Received discussion number from background script:", message.discussionNumber);
-        main(message.discussionNumber);
+        await main(message.discussionNumber);
     }
 });

@@ -9,21 +9,47 @@ import PatternDetail from './pages/PatternDetail';
 import SolutionImplementationList from './pages/SolutionImplementationList';
 import CreateSolution from './pages/CreateSolution';
 import SolutionImplementationDetail from './pages/SolutionImplementationDetail';
+import Login from './pages/Login';
 import { DiscussionDataProvider } from './context/DiscussionDataContext';
+import { isAuthenticated, logout, getCurrentUser, clearClientCache } from './api';
+import LoadingSpinner from './components/LoadingSpinner';
 import "./styles/layout/AppLayout.scss";
 // import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 
 type View = 'login' | 'patterns' | 'solutionsImplementations' | 'patternDetail' | 'solutionImplementationDetail' | 'createPattern' | 'createSolutionImplementation' | 'search';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('patterns');
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean>(false);
+  const [currentUserLogin, setCurrentUserLogin] = useState<string | null>(null);
+
+  // Check for authentication when the component mounts
+  useEffect(() => {
+    async function checkAuth() {
+      setIsAuthChecking(true);
+      const authenticated = await isAuthenticated();
+      setIsUserAuthenticated(authenticated);
+      
+      if (authenticated) {
+        const userLogin = await getCurrentUser();
+        setCurrentUserLogin(userLogin);
+      }
+      
+      setIsAuthChecking(false);
+    }
+
+    checkAuth();
+  }, []);
 
   // Check for the last visited view in local storage when the component mounts
   useEffect(() => {
     async function loadCurrentView() {
+      if (!isUserAuthenticated) return;
+      
       const result = await browser.storage.local.get('currentView');
       if (result.currentView) {
         setCurrentView(result.currentView as View);
@@ -31,10 +57,34 @@ function App() {
     }
 
     loadCurrentView();
-  }, []);
+  }, [isUserAuthenticated]);
+
+  const handleLoginSuccess = () => {
+    setIsUserAuthenticated(true);
+    setCurrentView('patterns');
+    
+    // Load user info after successful login
+    getCurrentUser().then(userLogin => setCurrentUserLogin(userLogin));
+    
+    // Notify background script to initialize extension
+    browser.runtime.sendMessage({ type: 'LOGIN_SUCCESS' }).catch(error => {
+      console.error('Failed to notify background script:', error);
+    });
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    clearClientCache();
+    setIsUserAuthenticated(false);
+    setCurrentUserLogin(null);
+    setCurrentView('login');
+  };
 
   const renderView = () => {
     switch (currentView) {
+      case 'login':
+        return <Login onLoginSuccess={handleLoginSuccess} />;
+
       case 'patterns':
         return (
           <PatternList
@@ -84,9 +134,6 @@ function App() {
           <p>No Pattern selected.</p>
         );
 
-      case 'login':
-        return <p>Login View (to be implemented)</p>;
-
       case 'search':
         return (
           <Search onClose={() => setCurrentView('patterns')} onDiscussionSelected={(result) => {
@@ -100,9 +147,39 @@ function App() {
     }
   };
 
+  // Show loading spinner while checking authentication
+  if (isAuthChecking) {
+    return (
+      <div className="app-layout">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
+
+  // Show login page if not authenticated
+  if (!isUserAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <DiscussionDataProvider>
       <div className="app-layout">
+        {/* User info bar */}
+        <div className="user-bar">
+          {currentUserLogin && (
+            <span className="user-info">
+              <FontAwesomeIcon icon={faUser} style={{ marginRight: '0.5rem' }} />
+              {currentUserLogin}
+            </span>
+          )}
+          <button className="logout-button" onClick={handleLogout} title="Logout">
+            <FontAwesomeIcon icon={faRightFromBracket} />
+          </button>
+        </div>
+
+        {/* Main header with navigation */}
         <header className="header">
           <div className="headerLeft">
             <div className="logo">
@@ -132,14 +209,9 @@ function App() {
               </button>
             </nav>
           </div>
-          {/*  <div className="headerRight">
-            <button className="userMenu">
-              <FontAwesomeIcon
-                icon={faBars}
-                style={{ color: "#49454f" }}
-              />
-            </button>
-          </div> */}
+          <div className="headerRight">
+            {/* Empty - user info moved to user-bar */}
+          </div>
         </header>
         {renderView()}
       </div>

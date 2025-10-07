@@ -7,7 +7,7 @@ import '../styles/pages/ListPage.scss';
 import solutionImplementationIconUrl from '../assets/solutionImplementations.svg';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 
 interface SolutionImplementationListProps {
     onSelectSolution: (number: number) => void;
@@ -15,7 +15,7 @@ interface SolutionImplementationListProps {
 }
 
 const SolutionImplementationList: React.FC<SolutionImplementationListProps> = ({ onSelectSolution, onAddSolutionImplementation }) => {
-    const { loading, error, ids, fetchDiscussionList } = useDiscussionData();
+    const { loading, error, ids, fetchDiscussionList, clearListCache } = useDiscussionData();
 
     const [solutionImplementations, setSolutionImplementations] = useState<SimpleDiscussion[]>([]);
     const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
@@ -50,6 +50,16 @@ const SolutionImplementationList: React.FC<SolutionImplementationListProps> = ({
         setCurrentPageIndex(prevIndex => prevIndex - 1);
     };
 
+    const handleRefresh = () => {
+        // Clear the cache
+        clearListCache('solutionImplementations');
+        // Reset pagination to first page
+        setPageHistory([null]);
+        setCurrentPageIndex(0);
+        setSolutionImplementations([]);
+        setPageInfo(null);
+    };
+
     let content;
     if (loading && solutionImplementations.length === 0) {
         content = <LoadingSpinner />;
@@ -82,7 +92,12 @@ const SolutionImplementationList: React.FC<SolutionImplementationListProps> = ({
                     <img src={solutionImplementationIconUrl} className="title-icon" alt="SolutionImplementations Icon" />
                     Solution Implementations
                 </h1>
-                <button onClick={onAddSolutionImplementation} className="create-button"><FontAwesomeIcon icon={faPlus} /></button>
+                <div className="header-buttons">
+                    <button onClick={handleRefresh} className="refresh-button" disabled={loading} title="Refresh list">
+                        <FontAwesomeIcon icon={faArrowsRotate} />
+                    </button>
+                    <button onClick={onAddSolutionImplementation} className="create-button"><FontAwesomeIcon icon={faPlus} /></button>
+                </div>
             </div>
 
             {content}

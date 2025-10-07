@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createSolution } from "../api/githubSolutions";
+import { createSolution } from "../api";
 import "../styles/pages/DetailPage.scss";
 import { useDiscussionData } from "../context/DiscussionDataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

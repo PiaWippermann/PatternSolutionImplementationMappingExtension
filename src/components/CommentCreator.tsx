@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from "./Comment.module.scss";
-import { createDiscussionComment } from '../api/githubQueries';
+import { addDiscussionComment } from '../api';
 import type { Comment } from '../types/GitHub';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -19,7 +19,7 @@ export default function CommentCreator({
 
         if (discussionId && commentText.trim()) {
             // Call the API to create a comment
-            const commentResponse = await createDiscussionComment(discussionId, commentText);
+            const commentResponse = await addDiscussionComment(discussionId, commentText);
 
             console.log("Comment created:", commentResponse);
 

@@ -1,8 +1,33 @@
-import browser from 'webextension-polyfill';
-import { getRepositoryIds, fetchAllSolutionsBody } from "./api/githubQueries";
+import browser from "webextension-polyfill";
+import { getRepositoryIds, getDiscussionsListData, getDiscussionDetails } from "./api";
+import type { BaseDiscussion } from "./types/GitHub";
 
 // Temporarily stores promises that are waiting for the "ready" message
 const readyResolvers = new Map<number, (value: unknown) => void>();
+
+/**
+ * Fetches ALL solution implementations by paginating through all pages
+ */
+async function fetchAllSolutionsBody(categoryId: string): Promise<BaseDiscussion[]> {
+    const allDiscussions: BaseDiscussion[] = [];
+    let cursor: string | null = null;
+    let hasNextPage = true;
+
+    while (hasNextPage) {
+        const result = await getDiscussionsListData(categoryId, cursor, 100);
+        
+        // Fetch full details for each discussion to get the body
+        const detailsPromises = result.nodes.map(node => getDiscussionDetails(node.number));
+        const details = await Promise.all(detailsPromises);
+        
+        allDiscussions.push(...details);
+        
+        hasNextPage = result.pageInfo.hasNextPage;
+        cursor = result.pageInfo.endCursor;
+    }
+
+    return allDiscussions;
+}
 
 /**
  * Fetches the solution implementations from GitHub discussions,
@@ -68,6 +93,13 @@ async function executeContentScript(tabId: number, discussionNumber: number) {
  * Initializes the extension by fetching and parsing URLs.
  */
 async function initializeExtension() {
+    const { githubToken } = await browser.storage.local.get('githubToken');
+    
+    if (!githubToken) {
+        console.log('No token found. User needs to login.');
+        return; // Don't initialize without authentication
+    }
+    
     await fetchAndParseUrls();
 }
 
@@ -81,6 +113,14 @@ browser.runtime.onInstalled.addListener(() => {
 browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.url) {
         console.log(`Tab updated and loaded: ${tab.url}`);
+
+        // Check if user is authenticated
+        const { githubToken } = await browser.storage.local.get('githubToken');
+        
+        if (!githubToken) {
+            console.log('User not authenticated. Not injecting content script.');
+            return; // Don't inject content script if not authenticated
+        }
 
         const result = await browser.storage.local.get('relevantUrls') as { relevantUrls: { url: string, discussionNumber: number }[] };
         const relevantUrls = result.relevantUrls || [];
@@ -104,5 +144,11 @@ browser.runtime.onMessage.addListener((message: any, sender: any) => {
             resolve(true);
             readyResolvers.delete(sender.tab.id);
         }
+    }
+    
+    // Listen for login success message from the popup
+    if (message.type === 'LOGIN_SUCCESS') {
+        console.log('Login success detected. Initializing extension...');
+        initializeExtension();
     }
 });
