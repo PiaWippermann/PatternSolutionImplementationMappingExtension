@@ -7,6 +7,19 @@
     flex-direction: column;
 }
 
+.sectionTitle {
+    margin-bottom: 1rem;
+}
+
+.mappingListTitle {
+    margin-bottom: 1rem;
+}
+
+.commentsTitle {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
 .createButton {
     background-color: #fff;
     color: $primary-color;
