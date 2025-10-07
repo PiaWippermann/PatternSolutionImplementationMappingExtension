@@ -21,7 +21,6 @@ export async function getToken(): Promise<string | null> {
     const result = await browser.storage.local.get(TOKEN_STORAGE_KEY) as Record<string, string>;
     return result[TOKEN_STORAGE_KEY] || null;
   } catch (error) {
-    console.error('Error retrieving token from storage:', error);
     return null;
   }
 }
@@ -33,9 +32,7 @@ export async function getToken(): Promise<string | null> {
 export async function setToken(token: string): Promise<void> {
   try {
     await browser.storage.local.set({ [TOKEN_STORAGE_KEY]: token });
-    console.log('Token saved successfully.');
   } catch (error) {
-    console.error('Error saving token to storage:', error);
     throw error;
   }
 }
@@ -49,7 +46,6 @@ export async function validateToken(token: string): Promise<boolean> {
   try {
     return await validateGitHubToken(token);
   } catch (error) {
-    console.error('Token validation failed:', error);
     return false;
   }
 }
@@ -64,9 +60,7 @@ export async function logout(): Promise<void> {
       'repositoryIds',
       'relevantUrls'
     ]);
-    console.log('Logout successful. Token and cached data cleared.');
   } catch (error) {
-    console.error('Error during logout:', error);
     throw error;
   }
 }
@@ -84,7 +78,6 @@ export async function getCurrentUser(): Promise<string | null> {
     const userInfo = await getCurrentUserInfo();
     return userInfo?.login || null;
   } catch (error) {
-    console.error('Error fetching current user:', error);
     return null;
   }
 }

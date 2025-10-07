@@ -1,7 +1,7 @@
 @use "../base/variables" as *;
 
 .search-page-container {
-    padding: 24px;
+    padding: 0;
     background-color: #fff;
     display: flex;
     flex-direction: column;
@@ -11,18 +11,19 @@
     right: 0;
     bottom: 0;
     overflow-y: auto;
-    font-family: Arial, sans-serif; // Stellen Sie sicher, dass dies Ihrer Hauptschriftart entspricht
+    font-family: Arial, sans-serif;
 }
 
 .search-header {
     margin-bottom: 24px;
+    padding: 24px 24px 0;
 }
 
 .search-title {
-    font-size: 1.8rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: $text-color;
-    margin: 0;
+    margin: 0 0 24px 24px;
 }
 
 .search-form {
@@ -30,6 +31,7 @@
     flex-direction: column;
     gap: 16px;
     margin-bottom: 24px;
+    padding: 0 24px;
 }
 
 .search-input-container {
@@ -76,6 +78,7 @@
 
 .search-results-container {
     flex: 1;
+    padding: 0 24px 24px;
 }
 
 .search-error {
@@ -95,6 +98,9 @@
         list-style: none;
         padding: 0;
         margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
 }
 
@@ -102,7 +108,7 @@
     background: none;
     border: 1px solid $border-color;
     border-radius: 24px;
-    padding: 8px 16px;
+    padding: 6px 12px;
     align-self: flex-start;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
@@ -111,12 +117,17 @@
     gap: 8px;
     color: $text-color;
     font-weight: 600;
-    margin-bottom: 16px;
+    font-size: 0.9rem;
+    margin: 24px 0 16px 24px;
 
     &:hover {
         background-color: $background-color;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     }
+}
+
+.back-button-text {
+    font-size: 0.9rem;
 }
 
 .results-count {
@@ -133,8 +144,9 @@
     padding: 8px;
     cursor: pointer;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
-    margin: 0 24px;
-    z-index: 10;
+    font-size: 1rem;
+    font-weight: 500;
+    color: $text-color;
 
     &:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
@@ -147,4 +159,8 @@
     color: $text-light;
     font-size: 1rem;
     padding-top: 50px;
+}
+
+.pagination-container {
+    margin: 16px 24px;
 }

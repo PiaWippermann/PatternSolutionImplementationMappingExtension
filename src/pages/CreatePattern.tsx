@@ -52,7 +52,6 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
 
       onClose();
     } catch (err) {
-      console.error("Error while creating:", err);
       alert("Creation failed.");
     } finally {
       setIsSubmitting(false);

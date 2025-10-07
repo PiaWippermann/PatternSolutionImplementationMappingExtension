@@ -69,7 +69,6 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
       // redirect back to solutions
       onClose();
     } catch (err) {
-      console.error("Error while creating:", err);
       alert("Creation failed.");
     } finally {
       setIsSubmitting(false); // Reset submitting state

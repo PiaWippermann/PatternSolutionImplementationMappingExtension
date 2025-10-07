@@ -178,9 +178,13 @@ export const VALIDATE_TOKEN_QUERY = gql`
  * Query to search discussions by title
  */
 export const SEARCH_DISCUSSIONS_QUERY = gql`
-  query SearchDiscussions($queryString: String!, $first: Int!) {
-    search(query: $queryString, type: DISCUSSION, first: $first) {
+  query SearchDiscussions($queryString: String!, $first: Int!, $after: String) {
+    search(query: $queryString, type: DISCUSSION, first: $first, after: $after) {
       discussionCount
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
       edges {
         node {
           ... on Discussion {

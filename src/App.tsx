@@ -17,61 +17,48 @@ import "./styles/layout/AppLayout.scss";
 // import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
-
 type View = 'login' | 'patterns' | 'solutionsImplementations' | 'patternDetail' | 'solutionImplementationDetail' | 'createPattern' | 'createSolutionImplementation' | 'search';
-
 function App() {
   const [currentView, setCurrentView] = useState<View>('patterns');
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
   const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean>(false);
   const [currentUserLogin, setCurrentUserLogin] = useState<string | null>(null);
-
   // Check for authentication when the component mounts
   useEffect(() => {
     async function checkAuth() {
       setIsAuthChecking(true);
       const authenticated = await isAuthenticated();
       setIsUserAuthenticated(authenticated);
-      
       if (authenticated) {
         const userLogin = await getCurrentUser();
         setCurrentUserLogin(userLogin);
       }
-      
       setIsAuthChecking(false);
     }
-
     checkAuth();
   }, []);
-
   // Check for the last visited view in local storage when the component mounts
   useEffect(() => {
     async function loadCurrentView() {
       if (!isUserAuthenticated) return;
-      
       const result = await browser.storage.local.get('currentView');
       if (result.currentView) {
         setCurrentView(result.currentView as View);
       }
     }
-
     loadCurrentView();
   }, [isUserAuthenticated]);
-
   const handleLoginSuccess = () => {
     setIsUserAuthenticated(true);
     setCurrentView('patterns');
-    
     // Load user info after successful login
     getCurrentUser().then(userLogin => setCurrentUserLogin(userLogin));
-    
     // Notify background script to initialize extension
-    browser.runtime.sendMessage({ type: 'LOGIN_SUCCESS' }).catch(error => {
-      console.error('Failed to notify background script:', error);
+    browser.runtime.sendMessage({ type: 'LOGIN_SUCCESS' }).catch(() => {
+      // Silently handle error - background script might not be ready
     });
   };
-
   const handleLogout = async () => {
     await logout();
     clearClientCache();
@@ -79,12 +66,10 @@ function App() {
     setCurrentUserLogin(null);
     setCurrentView('login');
   };
-
   const renderView = () => {
     switch (currentView) {
       case 'login':
         return <Login onLoginSuccess={handleLoginSuccess} />;
-
       case 'patterns':
         return (
           <PatternList
@@ -95,10 +80,8 @@ function App() {
             onAddPattern={() => setCurrentView('createPattern')}
           />
         );
-
       case 'createPattern':
         return <CreatePattern onClose={() => setCurrentView('patterns')} />;
-
       case 'solutionsImplementations':
         return (
           <SolutionImplementationList
@@ -109,11 +92,9 @@ function App() {
             onAddSolutionImplementation={() => setCurrentView('createSolutionImplementation')}
           />
         );
-
       case 'createSolutionImplementation':
         return (
           <CreateSolution onClose={() => setCurrentView('solutionsImplementations')} />);
-
       case 'solutionImplementationDetail':
         return selectedNumber !== null ? (
           <SolutionImplementationDetail
@@ -123,7 +104,6 @@ function App() {
         ) : (
           <p>No Solution Implementation selected.</p>
         );
-
       case 'patternDetail':
         return selectedNumber !== null ? (
           <PatternDetail
@@ -133,7 +113,6 @@ function App() {
         ) : (
           <p>No Pattern selected.</p>
         );
-
       case 'search':
         return (
           <Search onClose={() => setCurrentView('patterns')} onDiscussionSelected={(result) => {
@@ -141,12 +120,10 @@ function App() {
             setCurrentView(result.viewName as View);
           }} />
         );
-
       default:
         return null;
     }
   };
-
   // Show loading spinner while checking authentication
   if (isAuthChecking) {
     return (
@@ -157,12 +134,10 @@ function App() {
       </div>
     );
   }
-
   // Show login page if not authenticated
   if (!isUserAuthenticated) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
-
   return (
     <DiscussionDataProvider>
       <div className="app-layout">
@@ -178,7 +153,6 @@ function App() {
             <FontAwesomeIcon icon={faRightFromBracket} />
           </button>
         </div>
-
         {/* Main header with navigation */}
         <header className="header">
           <div className="headerLeft">
@@ -186,7 +160,6 @@ function App() {
               {/* SVG for Airbnb logo */}
             </div>
           </div>
-
           <div className="headerCenter">
             <nav className="mainNav">
               <button
@@ -218,5 +191,4 @@ function App() {
     </DiscussionDataProvider>
   );
 }
-
 export default App;

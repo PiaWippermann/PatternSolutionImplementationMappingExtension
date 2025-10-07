@@ -22,10 +22,8 @@ import type {
   PatternSolutionMapping,
   ListData
 } from "../types/DiscussionData";
-
 // Define the type for the callback function used in fetchDiscussionList
 type FetchListCallback = ({ }: ListData) => void;
-
 // Define the shape of the context
 type DiscussionDataContextType = {
   discussionData: DiscussionData;
@@ -40,7 +38,6 @@ type DiscussionDataContextType = {
   loading: boolean;
   error: string | null;
 };
-
 // Create the context with default values
 const DiscussionDataContext = createContext<DiscussionDataContextType>({
   discussionData: {
@@ -72,10 +69,8 @@ const DiscussionDataContext = createContext<DiscussionDataContextType>({
   loading: true,
   error: null,
 });
-
 // Custom hook to use the DiscussionDataContext
 export const useDiscussionData = () => useContext(DiscussionDataContext);
-
 // Provider component to wrap the app and provide the context
 export const DiscussionDataProvider: React.FC<{
   children: React.ReactNode;
@@ -101,36 +96,28 @@ export const DiscussionDataProvider: React.FC<{
     patternCategoryId: "",
     patternSolutionMappingCategoryId: "",
   });
-
   // Dynamic fetching of discussions (overview) with pagination
   // The `cursor` parameter is now a string or null.
   const fetchDiscussionList = useCallback(async (categoryId: string, cursor: string | null, onDataFetched: FetchListCallback) => {
     const type = categoryId === ids?.patternCategoryId ? 'patterns' : 'solutionImplementations';
-
     // Check if the request has already been made using the cursor as the key
     if (discussionData?.[type].listData[cursor || 'null']) {
-      console.log(`Data for ${type} with cursor ${cursor} already loaded.`);
       const cachedData = discussionData?.[type].listData[cursor || 'null'];
       // 💡 Daten über den Callback zurückgeben
       onDataFetched(cachedData);
       return;
     }
-
     // Data needs to be fetched from GitHub
     setLoading(true);
     setError(null); // Clear any previous errors
-
     try {
-      console.log(`Fetch data for ${type} with cursor ${cursor} from GitHub API`)
       const response = await getDiscussionsListData(categoryId, cursor, PAGE_SIZE);
-
       setDiscussionData(prevData => {
         const key = cursor || 'null';
         const dataToCache = {
           discussions: response.nodes,
           pageInfo: response.pageInfo,
         };
-
         return {
           ...prevData,
           [type]: {
@@ -143,47 +130,38 @@ export const DiscussionDataProvider: React.FC<{
           },
         };
       });
-
       // 💡 Daten über den Callback zurückgeben, nachdem der State aktualisiert wurde
       onDataFetched({
         discussions: response.nodes,
         pageInfo: response.pageInfo,
       });
-
-    } catch (err: any) {
-      setError(err.message || "Data could not be loaded.");
-      console.error(`Error loading ${type}:`, err);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Data could not be loaded.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   }, [ids, discussionData]);
-
   // Function to fetch details of a specific discussion by its ID
   // This is used when navigating to the detail view of a pattern or solution implementation
   // It first checks the cache, and if not found, fetches from GitHub
   const fetchDiscussionDetailsByNumber = useCallback(async (categoryId: string, discussionNumber: number) => {
     const type = categoryId === ids?.patternCategoryId ? 'patterns' : 'solutionImplementations';
-    let cachedDetails: any;
-
+    let cachedDetails: Pattern | SolutionImplementation | undefined;
     if (type == "patterns") {
       cachedDetails = discussionData?.patterns.details.find(d => d.number === discussionNumber);
     } else if (type == "solutionImplementations") {
       cachedDetails = discussionData?.solutionImplementations.details.find(d => d.number === discussionNumber);
     }
-
     if (cachedDetails) {
-      console.log(`Details for discussion ${discussionNumber} already loaded from cache.`);
       // return the found details
       return cachedDetails;
     }
-
     // 2. Load the data if not in cache
     setLoading(true);
     setError(null);
-
     try {
       const response = await getDiscussionDetails(discussionNumber);
-
       if (!response) {
         setError("Discussion not found.");
         return;
@@ -191,7 +169,6 @@ export const DiscussionDataProvider: React.FC<{
       // Based on the type the response body needs to be parsed and the details stored in the correct array
       if (type === "patterns") {
         const fullPatternData = parsePattern(response);
-
         setDiscussionData(prevData => ({
           ...prevData,
           patterns: {
@@ -199,11 +176,9 @@ export const DiscussionDataProvider: React.FC<{
             details: [...prevData.patterns.details, fullPatternData],
           },
         }));
-
         return fullPatternData;
       } else if (type === "solutionImplementations") {
         const fullSolutionData = parseSolution(response);
-
         setDiscussionData(prevData => ({
           ...prevData,
           solutionImplementations: {
@@ -211,44 +186,35 @@ export const DiscussionDataProvider: React.FC<{
             details: [...prevData.solutionImplementations.details, fullSolutionData],
           },
         }));
-
         return fullSolutionData;
       }
-    } catch (err: any) {
-      setError(err.message || "Details could not be loaded.");
-      console.error(`Error loading details for ${discussionNumber}:`, err);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Details could not be loaded.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   }, [discussionData]);
-
   const fetchMappingDiscussionByNumber = useCallback(async (discussionNumber: number) => {
     // Check if the patternSolutionMapping is already cached
     const cachedDetails = discussionData?.patternSolutionMappings.find(d => d.number == discussionNumber);
     if (cachedDetails) {
-      console.log("Mapping discussion found in cache")
       return cachedDetails;
     }
-
     // Load the discussion from the GitHub GraphQL API if it is not in the cache
     setLoading(true);
     setError(null);
-
     try {
       const response = await getDiscussionDetails(discussionNumber);
-
       if (!response) {
         setError("Discussion not found.");
         return;
       }
-
       const fullMappingData = parseMapping(response);
-
       if (!fullMappingData.patternDiscussionNumber || !fullMappingData.solutionImplementationDiscussionNumber) {
         // Mapping discussion body is not in the right format, ignore this discussion
         return;
       }
-
       setDiscussionData(prevData => ({
         ...prevData,
         patternSolutionMappings: [
@@ -256,41 +222,33 @@ export const DiscussionDataProvider: React.FC<{
           fullMappingData
         ],
       }));
-
       return fullMappingData;
-    } catch (err: any) {
-      setError(err.message || "Mapping discussion could not be loaded.");
-      console.error(`Error loading details for ${discussionNumber}:`, err);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Mapping discussion could not be loaded.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   }, [discussionData]);
-
   // Function to fetch repository IDs
   // Called when the component mounts for the first time
   const fetchRepoIds = useCallback(async () => {
     setLoading(true);
     setError(null); // Clear any previous errors
-
     try {
       const repoId = await getRepositoryIds();
       setIds(repoId);
-
-    } catch (err: any) {
-      console.error("Error when loading repository ids:", err);
-      setError(err.message || "Repository ids could not be loaded.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Repository ids could not be loaded.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   }, []);
-
   // Add a new pattern to the context state
   const addOrUpdatePatternData = (newPattern: Pattern) => {
-    console.log("Adding/updating pattern in context state:", newPattern);
     // Check if there is an existing pattern with the same id
     let existingPattern = discussionData.patterns.details.find(x => x.id == newPattern.id);
-    console.log("Existing pattern found in context state:", existingPattern);
-
     if (existingPattern) {
       // Update only the details entry of the discussion data patterns for the given existing pattern
       setDiscussionData(prevData => ({
@@ -303,8 +261,6 @@ export const DiscussionDataProvider: React.FC<{
           ],
         },
       }));
-
-      console.log("Pattern details updated in context state", discussionData.patterns.details);
     } else {
       // Completely add the new pattern data
       setDiscussionData(prevData => {
@@ -314,19 +270,16 @@ export const DiscussionDataProvider: React.FC<{
           details: [newPattern, ...prevData.patterns.details],
           listData: { ...prevData.patterns.listData }
         };
-
         // First, check if any of the listData already include the new pattern
         const existingPage = Object.values(newPatterns.listData).find(page =>
           page.discussions.some(discussion => discussion.id === newPattern.id)
         );
-
         // Add the new pattern to the list data if it is not found in the list data
         if (!existingPage) {
           // 2. Update the listData to include the new pattern in the first page if it exists
           const firstPage = newPatterns.listData['null']
             ? { ...newPatterns.listData['null'] }
             : null;
-
           if (firstPage) {
             // 3. Create a simplified object for the list
             const simplifiedPattern = {
@@ -334,9 +287,7 @@ export const DiscussionDataProvider: React.FC<{
               title: newPattern.title,
               number: newPattern.number,
             };
-
             firstPage.discussions = [simplifiedPattern, ...firstPage.discussions];
-
             if (firstPage.discussions.length > PAGE_SIZE) {
               firstPage.discussions.pop();
               const keysToRemove = Object.keys(newPatterns.listData).filter(key => key !== 'null');
@@ -360,7 +311,6 @@ export const DiscussionDataProvider: React.FC<{
             };
           }
         }
-
         return {
           ...prevData,
           patterns: newPatterns
@@ -368,12 +318,10 @@ export const DiscussionDataProvider: React.FC<{
       });
     }
   };
-
   // Add a new solution implementation to the context state
   const addOrUpdateSolutionImplementationData = (newSolutionImplementation: SolutionImplementation) => {
     // Check if there is an existing solution with the same id
     let existingSolution = discussionData.solutionImplementations.details.find(x => x.id == newSolutionImplementation.id);
-
     if (existingSolution) {
       // Update only the details entry of the discussion data solutionImplementations for the given existing solution
       setDiscussionData(prevData => ({
@@ -395,20 +343,16 @@ export const DiscussionDataProvider: React.FC<{
           details: [newSolutionImplementation, ...prevData.solutionImplementations.details],
           listData: { ...prevData.solutionImplementations.listData }
         };
-
         // First, check if any of the listData already include the new solution
         const existingPage = Object.values(newSolutions.listData).find(page =>
           page.discussions.some(discussion => discussion.id === newSolutionImplementation.id)
         );
-
         // Add the new solution to the list data if it is not found in the list data
         if (!existingPage) {
-
           // 2. Update the listData to include the new solution in the first page if it exists
           const firstPage = newSolutions.listData['null']
             ? { ...newSolutions.listData['null'] }
             : null; // 'null' key for the first page
-
           if (firstPage) {
             // 3. Create a simplified object for the list
             const simplifiedSolution = {
@@ -416,7 +360,6 @@ export const DiscussionDataProvider: React.FC<{
               title: newSolutionImplementation.title,
               number: newSolutionImplementation.number,
             };
-
             firstPage.discussions = [simplifiedSolution, ...firstPage.discussions];
             if (firstPage.discussions.length > PAGE_SIZE) {
               firstPage.discussions.pop();
@@ -442,7 +385,6 @@ export const DiscussionDataProvider: React.FC<{
             };
           }
         }
-
         return {
           ...prevData,
           solutionImplementations: newSolutions
@@ -450,12 +392,10 @@ export const DiscussionDataProvider: React.FC<{
       });
     }
   };
-
   // Add a new mapping to the context state
   const addOrUpdateMappingData = (newMapping: PatternSolutionMapping) => {
     // Check if there is an existing mapping with the same id and update if existing 
     let existingMapping = discussionData.patternSolutionMappings.find(x => x.id == newMapping.id);
-
     if (existingMapping) {
       // Update the discussionData existing mapping entry
       setDiscussionData(prevData => ({
@@ -471,11 +411,8 @@ export const DiscussionDataProvider: React.FC<{
         ...prevData,
         patternSolutionMappings: [newMapping, ...prevData.patternSolutionMappings],
       }));
-
-      console.log("New mapping added to context state", discussionData.patternSolutionMappings);
     }
   };
-
   // Clear list cache for a specific type to force reload
   const clearListCache = (type: 'patterns' | 'solutionImplementations') => {
     setDiscussionData(prevData => ({
@@ -487,12 +424,10 @@ export const DiscussionDataProvider: React.FC<{
       },
     }));
   };
-
   // fetch repo ids on mount
   useEffect(() => {
     fetchRepoIds();
   }, []);
-
   return (
     <DiscussionDataContext.Provider
       value={{
@@ -503,4 +438,3 @@ export const DiscussionDataProvider: React.FC<{
     </DiscussionDataContext.Provider>
   );
 };
-

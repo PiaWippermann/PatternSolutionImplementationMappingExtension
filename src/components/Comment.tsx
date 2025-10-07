@@ -18,7 +18,6 @@ export default function CommentComponent({
 
   useEffect(() => {
     // This effect runs when the component mounts or when commentData changes
-    console.log("Comment data changed:", commentData);
   }, [commentData]);
 
   return (

@@ -14,7 +14,6 @@ interface SolutionImplementationDetailProps {
 
 const SolutionImplementationDetail: React.FC<SolutionImplementationDetailProps> = ({ solutionImplementationNumber, onClose }) => {
     // use params to get the pattern number from the URL 
-    console.log("solutionImplementationNumber", solutionImplementationNumber);
     const { loading, error, fetchDiscussionDetailsByNumber, ids } = useDiscussionData();
 
     // State for loaded details

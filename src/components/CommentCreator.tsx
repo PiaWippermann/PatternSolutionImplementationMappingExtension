@@ -21,7 +21,6 @@ export default function CommentCreator({
             // Call the API to create a comment
             const commentResponse = await addDiscussionComment(discussionId, commentText);
 
-            console.log("Comment created:", commentResponse);
 
             // Pass the created comment back to the parent component by calling the onCommentSubmit callback
             onCommentSubmit(commentResponse);
