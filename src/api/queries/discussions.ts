@@ -11,7 +11,8 @@ import {
   GET_COMMENTS_QUERY,
   CREATE_DISCUSSION_MUTATION,
   ADD_COMMENT_MUTATION,
-  SEARCH_DISCUSSIONS_QUERY
+  SEARCH_DISCUSSIONS_QUERY,
+  UPDATE_DISCUSSION_MUTATION
 } from "./index";
 import { GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from "../../config";
 import type { BaseDiscussion, Comment, PageInfo, SimpleDiscussion } from "../../types/GitHub";
@@ -21,7 +22,8 @@ import type {
   GetCommentsResponse,
   CreateDiscussionResponse,
   AddCommentResponse,
-  SearchDiscussionsResponse
+  SearchDiscussionsResponse,
+  UpdateDiscussionResponse
 } from "../../types/GraphQLResponses";
 
 /**
@@ -182,4 +184,21 @@ export async function searchDiscussions(
     pageInfo: data.search.pageInfo,
     discussionCount: categoryId ? nodes.length : data.search.discussionCount
   };
+}
+
+/**
+ * Updates the body of an existing discussion
+ */
+export async function updateDiscussionBody(
+  discussionId: string,
+  newBody: string
+): Promise<BaseDiscussion> {
+  const client = await getClient();
+
+  const data = await client.request<UpdateDiscussionResponse>(UPDATE_DISCUSSION_MUTATION, {
+    discussionId,
+    body: newBody,
+  });
+
+  return data.updateDiscussion.discussion;
 }

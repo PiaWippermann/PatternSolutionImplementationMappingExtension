@@ -163,6 +163,36 @@ export const ADD_COMMENT_MUTATION = gql`
 `;
 
 /**
+ * Mutation to update a discussion body
+ */
+export const UPDATE_DISCUSSION_MUTATION = gql`
+  mutation UpdateDiscussion($discussionId: ID!, $body: String!) {
+    updateDiscussion(input: { discussionId: $discussionId, body: $body }) {
+      discussion {
+        id
+        title
+        url
+        number
+        author {
+          avatarUrl
+          login
+        }
+        body
+        category {
+          id
+          name
+          description
+          emojiHTML
+        }
+        createdAt
+        viewerCanDelete
+        viewerCanUpdate
+      }
+    }
+  }
+`;
+
+/**
  * Query to validate a GitHub token and get current user info
  */
 export const VALIDATE_TOKEN_QUERY = gql`

@@ -40,6 +40,12 @@ export interface AddCommentResponse {
   };
 }
 
+export interface UpdateDiscussionResponse {
+  updateDiscussion: {
+    discussion: BaseDiscussion;
+  };
+}
+
 export interface SearchDiscussionsResponse {
   search: {
     discussionCount: number;
