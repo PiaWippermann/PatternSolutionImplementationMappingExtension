@@ -14,15 +14,14 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
   const { loading, error, ids, addOrUpdateSolutionImplementationData } = useDiscussionData();
   // State to manage submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [solutionsUrl, setSolutionsUrl] = useState("");
 
   const close = () => onClose();
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [solutionsUrl, setSolutionsUrl] = useState("");
 
   const repositoryId = ids?.repositoryId || "";
   const solutionImplementationCategoryId = ids?.solutionImplementationCategoryId || "";
@@ -68,7 +67,7 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
 
       // redirect back to solutions
       onClose();
-    } catch (err) {
+    } catch {
       alert("Creation failed.");
     } finally {
       setIsSubmitting(false); // Reset submitting state

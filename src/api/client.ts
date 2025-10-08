@@ -21,7 +21,7 @@ export async function getClient(): Promise<GraphQLClient> {
   // Dynamic import to avoid circular dependency
   const { getToken } = await import('./auth');
   const token = await getToken();
-  
+
   if (!token) {
     throw new Error('No authentication token found. Please login.');
   }

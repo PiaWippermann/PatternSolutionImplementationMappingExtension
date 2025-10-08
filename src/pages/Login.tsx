@@ -29,7 +29,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       } else {
         setError('Invalid token. Please check your token and try again.');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during login. Please try again.');
     } finally {
       setIsLoading(false);

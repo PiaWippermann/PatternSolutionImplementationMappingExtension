@@ -3,7 +3,7 @@ export type MessagePayload = {
     payload: {
         // Hier deine Datenstruktur definieren, z.B.
         key: string;
-        value: any;
+        value: unknown;
     };
 };
 

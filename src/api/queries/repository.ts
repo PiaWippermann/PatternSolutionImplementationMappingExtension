@@ -23,7 +23,7 @@ export async function getRepositoryIds(): Promise<RepositoryIds> {
   });
 
   const categories = data.repository.discussionCategories.nodes;
-  
+
   const patternCategory = categories.find((cat: RepositoryCategory) => cat.name === "Patterns");
   const solutionCategory = categories.find((cat: RepositoryCategory) => cat.name === "Solution Implementations");
   const mappingCategory = categories.find((cat: RepositoryCategory) => cat.name === "Pattern - Solution Implementation Mapping");
@@ -53,7 +53,7 @@ export async function validateGitHubToken(token: string): Promise<boolean> {
 
     await client.request<ValidateTokenResponse>(VALIDATE_TOKEN_QUERY);
     return true;
-  } catch (error: unknown) {
+  } catch {
     return false;
   }
 }

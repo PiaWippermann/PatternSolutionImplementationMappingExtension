@@ -20,7 +20,7 @@ export async function getToken(): Promise<string | null> {
   try {
     const result = await browser.storage.local.get(TOKEN_STORAGE_KEY) as Record<string, string>;
     return result[TOKEN_STORAGE_KEY] || null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -30,11 +30,7 @@ export async function getToken(): Promise<string | null> {
  * @param token The token to store.
  */
 export async function setToken(token: string): Promise<void> {
-  try {
-    await browser.storage.local.set({ [TOKEN_STORAGE_KEY]: token });
-  } catch (error) {
-    throw error;
-  }
+  await browser.storage.local.set({ [TOKEN_STORAGE_KEY]: token });
 }
 
 /**
@@ -45,7 +41,7 @@ export async function setToken(token: string): Promise<void> {
 export async function validateToken(token: string): Promise<boolean> {
   try {
     return await validateGitHubToken(token);
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -54,15 +50,11 @@ export async function validateToken(token: string): Promise<boolean> {
  * Logs out the user by removing the token and clearing cached data.
  */
 export async function logout(): Promise<void> {
-  try {
-    await browser.storage.local.remove([
-      TOKEN_STORAGE_KEY,
-      'repositoryIds',
-      'relevantUrls'
-    ]);
-  } catch (error) {
-    throw error;
-  }
+  await browser.storage.local.remove([
+    TOKEN_STORAGE_KEY,
+    'repositoryIds',
+    'relevantUrls'
+  ]);
 }
 
 /**
@@ -77,7 +69,7 @@ export async function getCurrentUser(): Promise<string | null> {
     const { getCurrentUserInfo } = await import('./queries/repository');
     const userInfo = await getCurrentUserInfo();
     return userInfo?.login || null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

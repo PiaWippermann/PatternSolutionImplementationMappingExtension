@@ -5,9 +5,9 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { 
-  getRepositoryIds, 
-  getDiscussionsListData, 
+import {
+  getRepositoryIds,
+  getDiscussionsListData,
   getDiscussionDetails,
   parsePattern,
   parseSolution,
@@ -23,7 +23,7 @@ import type {
   ListData
 } from "../types/DiscussionData";
 // Define the type for the callback function used in fetchDiscussionList
-type FetchListCallback = ({ }: ListData) => void;
+type FetchListCallback = (data: ListData) => void;
 // Define the shape of the context
 type DiscussionDataContextType = {
   discussionData: DiscussionData;
@@ -70,6 +70,7 @@ const DiscussionDataContext = createContext<DiscussionDataContextType>({
   error: null,
 });
 // Custom hook to use the DiscussionDataContext
+// eslint-disable-next-line react-refresh/only-export-components
 export const useDiscussionData = () => useContext(DiscussionDataContext);
 // Provider component to wrap the app and provide the context
 export const DiscussionDataProvider: React.FC<{
@@ -194,7 +195,7 @@ export const DiscussionDataProvider: React.FC<{
     } finally {
       setLoading(false);
     }
-  }, [discussionData]);
+  }, [discussionData, ids?.patternCategoryId]);
   const fetchMappingDiscussionByNumber = useCallback(async (discussionNumber: number) => {
     // Check if the patternSolutionMapping is already cached
     const cachedDetails = discussionData?.patternSolutionMappings.find(d => d.number == discussionNumber);
@@ -248,7 +249,7 @@ export const DiscussionDataProvider: React.FC<{
   // Add a new pattern to the context state
   const addOrUpdatePatternData = (newPattern: Pattern) => {
     // Check if there is an existing pattern with the same id
-    let existingPattern = discussionData.patterns.details.find(x => x.id == newPattern.id);
+    const existingPattern = discussionData.patterns.details.find(x => x.id == newPattern.id);
     if (existingPattern) {
       // Update only the details entry of the discussion data patterns for the given existing pattern
       setDiscussionData(prevData => ({
@@ -321,7 +322,7 @@ export const DiscussionDataProvider: React.FC<{
   // Add a new solution implementation to the context state
   const addOrUpdateSolutionImplementationData = (newSolutionImplementation: SolutionImplementation) => {
     // Check if there is an existing solution with the same id
-    let existingSolution = discussionData.solutionImplementations.details.find(x => x.id == newSolutionImplementation.id);
+    const existingSolution = discussionData.solutionImplementations.details.find(x => x.id == newSolutionImplementation.id);
     if (existingSolution) {
       // Update only the details entry of the discussion data solutionImplementations for the given existing solution
       setDiscussionData(prevData => ({
@@ -395,7 +396,7 @@ export const DiscussionDataProvider: React.FC<{
   // Add a new mapping to the context state
   const addOrUpdateMappingData = (newMapping: PatternSolutionMapping) => {
     // Check if there is an existing mapping with the same id and update if existing 
-    let existingMapping = discussionData.patternSolutionMappings.find(x => x.id == newMapping.id);
+    const existingMapping = discussionData.patternSolutionMappings.find(x => x.id == newMapping.id);
     if (existingMapping) {
       // Update the discussionData existing mapping entry
       setDiscussionData(prevData => ({
@@ -427,7 +428,7 @@ export const DiscussionDataProvider: React.FC<{
   // fetch repo ids on mount
   useEffect(() => {
     fetchRepoIds();
-  }, []);
+  }, [fetchRepoIds]);
   return (
     <DiscussionDataContext.Provider
       value={{

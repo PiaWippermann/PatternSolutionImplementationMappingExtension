@@ -47,7 +47,7 @@ export function PatternSelector({
                 <span className="back-button-text">Back</span>
             </button>
             <h3 className={styles.sectionTitle}>Create a new mapping</h3>
-            
+
             {/* Search Input */}
             <div className="search-input-container" style={{ margin: '16px 0' }}>
                 <input
@@ -68,11 +68,11 @@ export function PatternSelector({
             </div>
 
             {isLoading && <LoadingSpinner />}
-            
+
             {!isLoading && patternMappingOptionList.length === 0 && (
                 <p>{isSearching ? 'No patterns found matching your search.' : 'No items found.'}</p>
             )}
-            
+
             {!isLoading && patternMappingOptionList.length > 0 && (
                 <ul className={styles.creationList}>
                     {patternMappingOptionList.map(item => (
@@ -82,7 +82,7 @@ export function PatternSelector({
                     ))}
                 </ul>
             )}
-            
+
             <Pagination
                 onPrevPage={onPrevPage}
                 onNextPage={onNextPage}

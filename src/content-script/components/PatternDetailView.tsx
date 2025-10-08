@@ -28,10 +28,10 @@ export function PatternDetailView({
             </button>
             <h3 className={styles.sectionTitle}>Pattern Details</h3>
             <div className={styles.selectedPatternDetails}>
-                <img 
-                    src={selectedPattern.icon} 
-                    alt={`${selectedPattern.title} Icon`} 
-                    className={sidebarStyles.icon} 
+                <img
+                    src={selectedPattern.icon}
+                    alt={`${selectedPattern.title} Icon`}
+                    className={sidebarStyles.icon}
                 />
                 <h3>{selectedPattern.title}</h3>
                 <button className={styles.createButton} onClick={onCreateMapping}>

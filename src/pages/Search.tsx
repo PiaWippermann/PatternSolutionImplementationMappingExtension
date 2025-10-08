@@ -60,13 +60,13 @@ const Search: React.FC<SearchProps> = ({ onClose, onDiscussionSelected }) => {
             setSearchResults(formattedResults);
             setHasNextPage(data.pageInfo.hasNextPage);
             setCurrentCursor(data.pageInfo.endCursor);
-            
+
             // Reset history when new search is performed (no cursor)
             if (!cursor) {
                 setCursorHistory([null]);
                 setHasPrevPage(false);
             }
-        } catch (err) {
+        } catch {
             setError("An error occurred during the search. Please try again.");
         } finally {
             setIsLoading(false);
@@ -75,27 +75,27 @@ const Search: React.FC<SearchProps> = ({ onClose, onDiscussionSelected }) => {
 
     const handleNextPage = async () => {
         if (!hasNextPage || !currentCursor) return;
-        
+
         // Add current cursor to history before moving to next page
         setCursorHistory(prev => [...prev, currentCursor]);
         setHasPrevPage(true);
-        
-        const mockEvent = { preventDefault: () => {} } as React.FormEvent;
+
+        const mockEvent = { preventDefault: () => { } } as React.FormEvent;
         await handleSearch(mockEvent, currentCursor);
     };
 
     const handlePrevPage = async () => {
         if (!hasPrevPage) return;
-        
+
         // Get previous cursor from history
         const newHistory = [...cursorHistory];
         newHistory.pop(); // Remove current cursor
         const prevCursor = newHistory[newHistory.length - 1] || null;
-        
+
         setCursorHistory(newHistory);
         setHasPrevPage(newHistory.length > 1);
-        
-        const mockEvent = { preventDefault: () => {} } as React.FormEvent;
+
+        const mockEvent = { preventDefault: () => { } } as React.FormEvent;
         await handleSearch(mockEvent, prevCursor);
     };
 

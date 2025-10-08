@@ -34,7 +34,7 @@ export default function CommentCreator({
             <textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Schreibe einen Kommentar..."
+                placeholder="Write a comment ..."
                 className={styles.commentTextarea}
             />
             <button

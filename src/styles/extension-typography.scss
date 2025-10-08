@@ -7,67 +7,67 @@
     font-size: 14px !important;
     line-height: 1.5 !important;
     color: #1f2328 !important;
-    
+
     /* Reset for all children */
     * {
         font-family: inherit !important;
         box-sizing: border-box !important;
     }
-    
+
     /* Headings */
     h1 {
         font-size: 2em !important;
         font-weight: 600 !important;
         line-height: 1.25 !important;
     }
-    
+
     h2 {
         font-size: 1.5em !important;
         font-weight: 600 !important;
         line-height: 1.25 !important;
     }
-    
+
     h3 {
         font-size: 1.25em !important;
         font-weight: 600 !important;
         line-height: 1.25 !important;
     }
-    
+
     h4 {
         font-size: 1em !important;
         font-weight: 600 !important;
         line-height: 1.25 !important;
     }
-    
+
     h5 {
         font-size: 0.875em !important;
         font-weight: 600 !important;
         line-height: 1.25 !important;
     }
-    
+
     h6 {
         font-size: 0.85em !important;
         font-weight: 600 !important;
         line-height: 1.25 !important;
     }
-    
+
     /* Paragraphs */
     p {
         font-size: 14px !important;
         line-height: 1.5 !important;
     }
-    
+
     /* Links */
     a {
         color: #0969da !important;
         text-decoration: none !important;
         font-size: inherit !important;
-        
+
         &:hover {
             text-decoration: underline !important;
         }
     }
-    
+
     /* Buttons */
     button {
         font-size: 14px !important;
@@ -75,7 +75,7 @@
         font-weight: 500 !important;
         font-family: inherit !important;
     }
-    
+
     /* Inputs and textareas */
     input,
     textarea {
@@ -83,43 +83,45 @@
         line-height: 1.5 !important;
         font-family: inherit !important;
     }
-    
+
     /* Spans and other inline elements */
     span {
         font-size: inherit !important;
         line-height: inherit !important;
     }
-    
+
     /* Lists */
-    ul, ol {
+    ul,
+    ol {
         font-size: 14px !important;
         line-height: 1.5 !important;
         padding-left: 0 !important;
     }
-    
+
     li {
         font-size: inherit !important;
         line-height: inherit !important;
     }
-    
+
     /* Labels */
     label {
         font-size: 14px !important;
         line-height: 1.5 !important;
         font-weight: 500 !important;
     }
-    
+
     /* Small text */
     small {
         font-size: 12px !important;
         line-height: 1.5 !important;
     }
-    
+
     /* Strong/bold */
-    strong, b {
+    strong,
+    b {
         font-weight: 600 !important;
     }
-    
+
     /* Code elements */
     code {
         font-size: 12px !important;

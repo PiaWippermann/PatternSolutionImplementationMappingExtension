@@ -85,14 +85,14 @@ export function SolutionSidebar({ solutionImplementationNumber }: SolutionSideba
     const showPatternDetails = async (patternDiscussionNumber: number) => {
         setIsLoadingSolution(true);
         const patternDiscussion = await getDiscussionDetails(patternDiscussionNumber) as BaseDiscussion;
-        
+
         if (!patternDiscussion) {
             setIsLoadingSolution(false);
             return;
         }
 
         const patternDetails = parsePattern(patternDiscussion);
-        
+
         if (!patternDetails) {
             setIsLoadingSolution(false);
             return;
@@ -110,7 +110,7 @@ export function SolutionSidebar({ solutionImplementationNumber }: SolutionSideba
 
         try {
             setIsLoadingSolution(true);
-            
+
             const { repositoryIds: ids } = await browser.storage.local.get('repositoryIds') as {
                 repositoryIds: {
                     patternCategoryId: string;
@@ -162,7 +162,7 @@ export function SolutionSidebar({ solutionImplementationNumber }: SolutionSideba
             setIsInAddMappingMode(false);
             setSelectedPatternOptionDetails(undefined);
         } catch (error) {
-            // Error handling - silently fail
+            console.error('Failed to create mapping:', error);
         }
         setIsLoadingSolution(false);
     };
@@ -200,7 +200,7 @@ export function SolutionSidebar({ solutionImplementationNumber }: SolutionSideba
                 });
             });
         } catch (error) {
-            // Error handling - silently fail
+            console.error('Failed to load discussion comments:', error);
         } finally {
             // Set the loading state for this discussion to false
             setIsLoadingComments(prev => ({ ...prev, [discussionId]: false }));

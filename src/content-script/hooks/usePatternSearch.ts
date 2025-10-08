@@ -2,7 +2,7 @@
  * Custom Hook for pattern search functionality
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import browser from 'webextension-polyfill';
 import type { SimpleDiscussion, PageInfo } from '../../types/GitHub';
 import type { PatternSolutionMapping } from '../../types/DiscussionData';
@@ -23,15 +23,9 @@ export function usePatternSearch(
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        if (isInAddMappingMode) {
-            loadPatternOptions();
-        }
-    }, [isInAddMappingMode, currentListPageIndex, patternSearchTerm]);
-
-    const loadPatternOptions = async () => {
+    const loadPatternOptions = useCallback(async () => {
         setIsLoading(true);
-        
+
         const { repositoryIds: ids } = await browser.storage.local.get('repositoryIds') as {
             repositoryIds: {
                 patternCategoryId: string;
@@ -78,12 +72,18 @@ export function usePatternSearch(
                 setPatternMappingOptionList(patternOptions);
                 setListPageInfo(response.pageInfo);
             }
-        } catch (error) {
+        } catch {
             // Error handling - silently fail
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [listPageHistory, currentListPageIndex, patternSearchTerm, mappingDiscussions]);
+
+    useEffect(() => {
+        if (isInAddMappingMode) {
+            loadPatternOptions();
+        }
+    }, [isInAddMappingMode, loadPatternOptions]);
 
     const handleNextPage = () => {
         const nextCursor = listPageInfo?.endCursor || null;

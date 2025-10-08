@@ -62,6 +62,7 @@ async function executeContentScript(tabId: number, discussionNumber: number) {
             discussionNumber: discussionNumber
         });
     } catch (error) {
+        console.error('Failed to execute content script:', error);
     }
 }
 /**

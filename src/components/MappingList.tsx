@@ -45,6 +45,7 @@ const MappingList: React.FC<MappingListProps> = ({ sourceDiscussion }) => {
                 const validDiscussions = allDiscussions.filter(discussion => discussion !== null);
                 setMappingDiscussions(validDiscussions);
             } catch (error) {
+                console.error('Failed to load mapped discussions:', error);
             }
         };
 
@@ -156,6 +157,7 @@ const MappingList: React.FC<MappingListProps> = ({ sourceDiscussion }) => {
                 });
             });
         } catch (error) {
+            console.error('Failed to load comments:', error);
         } finally {
             // Setze den Ladezustand für diese Diskussion auf false
             setIsLoadingComments(prev => ({ ...prev, [discussionId]: false }));

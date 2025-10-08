@@ -15,13 +15,13 @@ import {
 } from "./index";
 import { GITHUB_REPO_OWNER, GITHUB_REPO_NAME } from "../../config";
 import type { BaseDiscussion, Comment, PageInfo, SimpleDiscussion } from "../../types/GitHub";
-import type { 
-  GetDiscussionsResponse, 
-  GetSimpleDiscussionResponse, 
-  GetCommentsResponse, 
-  CreateDiscussionResponse, 
-  AddCommentResponse, 
-  SearchDiscussionsResponse 
+import type {
+  GetDiscussionsResponse,
+  GetSimpleDiscussionResponse,
+  GetCommentsResponse,
+  CreateDiscussionResponse,
+  AddCommentResponse,
+  SearchDiscussionsResponse
 } from "../../types/GraphQLResponses";
 
 /**
@@ -140,11 +140,11 @@ export async function searchDiscussions(
 
   // Build search query that excludes the mapping category
   // GitHub will search for the terms in title and body by default
-  let queryString = `repo:${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} -category:"${mappingCategoryName}" ${trimmedTerm}`;
-  
+  const queryString = `repo:${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME} -category:"${mappingCategoryName}" ${trimmedTerm}`;
+
   // If a specific categoryId is provided, we need to filter by category name
   // Note: GitHub Search doesn't support filtering by category ID, so we'll filter client-side
-  
+
   const data = await client.request<SearchDiscussionsResponse>(SEARCH_DISCUSSIONS_QUERY, {
     queryString,
     first: limit,

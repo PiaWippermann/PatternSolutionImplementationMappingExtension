@@ -52,10 +52,10 @@ export function MappingListView({
                                 className={styles.mappingHeader}
                                 onClick={() => onMappingClick(discussion.number)}
                             >
-                                <img 
-                                    src={patternDetails[discussion.number]?.details?.icon} 
-                                    alt={`${patternDetails[discussion.number]?.details?.title} Icon`} 
-                                    className={sidebarStyles.icon} 
+                                <img
+                                    src={patternDetails[discussion.number]?.details?.icon}
+                                    alt={`${patternDetails[discussion.number]?.details?.title} Icon`}
+                                    className={sidebarStyles.icon}
                                 />
                                 <span className={sidebarStyles.mappingTitle}>
                                     {patternDetails[discussion.number]?.details?.title}

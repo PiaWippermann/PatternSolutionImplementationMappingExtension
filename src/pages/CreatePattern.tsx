@@ -14,16 +14,15 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
   const { loading, error, ids, addOrUpdatePatternData } = useDiscussionData();
   // State to manage submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [referenceUrl, setReferenceUrl] = useState("");
+  const [iconUrl, setIconUrl] = useState("");
 
   const close = () => onClose();
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [referenceUrl, setReferenceUrl] = useState("");
-  const [iconUrl, setIconUrl] = useState("");
 
   const repositoryId = ids?.repositoryId || "";
   const patternCategoryId = ids?.patternCategoryId || "";
@@ -51,7 +50,7 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
       }
 
       onClose();
-    } catch (err) {
+    } catch {
       alert("Creation failed.");
     } finally {
       setIsSubmitting(false);

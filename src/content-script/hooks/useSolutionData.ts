@@ -25,12 +25,12 @@ export function useSolutionData(solutionImplementationNumber: number) {
         const loadDetails = async () => {
             setIsLoading(true);
 
-            const { repositoryIds: ids } = await browser.storage.local.get('repositoryIds') as { 
-                repositoryIds: { 
-                    patternCategoryId: string; 
-                    solutionImplementationCategoryId: string; 
-                    repositoryId: string 
-                } | null 
+            const { repositoryIds: ids } = await browser.storage.local.get('repositoryIds') as {
+                repositoryIds: {
+                    patternCategoryId: string;
+                    solutionImplementationCategoryId: string;
+                    repositoryId: string
+                } | null
             };
 
             if (!ids) {
@@ -40,14 +40,14 @@ export function useSolutionData(solutionImplementationNumber: number) {
 
             if (solutionImplementationNumber && ids?.solutionImplementationCategoryId) {
                 const solutionDiscussion = await getDiscussionDetails(solutionImplementationNumber) as BaseDiscussion;
-                
+
                 if (!solutionDiscussion) {
                     setIsLoading(false);
                     return;
                 }
 
                 const solutionDetails = parseSolution(solutionDiscussion);
-                
+
                 if (!solutionDetails) {
                     setIsLoading(false);
                     return;
@@ -59,7 +59,7 @@ export function useSolutionData(solutionImplementationNumber: number) {
                 }
 
                 const mappingNumbers = solutionDetails.mappings;
-                
+
                 if (mappingNumbers.length === 0) {
                     setIsLoading(false);
                     return;
@@ -101,7 +101,7 @@ export function useSolutionData(solutionImplementationNumber: number) {
         };
 
         loadDetails();
-    }, [solutionImplementationNumber]);
+    }, [solutionImplementationNumber, solutionImplementationDetails?.number]);
 
     const togglePatternVisibility = (mappingDiscussionNumber: number) => {
         setPatternDetails(prevDetails => ({
