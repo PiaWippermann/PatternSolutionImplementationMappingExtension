@@ -66,6 +66,15 @@ export function MappingListView({
                             </div>
                             {patternDetails[discussion.number]?.isVisible && (
                                 <div className={styles.linkedDetailsContainer}>
+                                    {patternDetails[discussion.number]?.details?.patternLanguage && (
+                                        <>
+                                            <div className={styles.patternLanguageSection}>
+                                                <strong>Pattern Language:</strong>{' '}
+                                                <span>{patternDetails[discussion.number]?.details?.patternLanguage}</span>
+                                            </div>
+                                            <div className={styles.separator}></div>
+                                        </>
+                                    )}
                                     <p>{patternDetails[discussion.number]?.details?.description}</p>
                                     <div className={styles.separator}></div>
                                     <h4 className={styles.commentsTitle}>Comments</h4>

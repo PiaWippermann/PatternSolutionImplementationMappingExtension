@@ -98,6 +98,7 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter solution name"
                 required
               />
             </div>
@@ -108,6 +109,7 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
                 className="custom-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe the solution implementation..."
                 required
               />
             </div>
@@ -119,6 +121,7 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
                 type="string"
                 value={solutionsUrl}
                 onChange={(e) => setSolutionsUrl(e.target.value)}
+                placeholder="Enter any URL or reference (GitHub, documentation, etc.)"
                 required
               />
             </div>

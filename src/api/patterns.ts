@@ -17,6 +17,7 @@ export async function createPattern({
   categoryId,
   title,
   description,
+  patternLanguage,
   referenceUrl,
   iconUrl,
 }: {
@@ -24,11 +25,13 @@ export async function createPattern({
   categoryId: string;
   title: string;
   description: string;
+  patternLanguage?: string;
   referenceUrl: string;
   iconUrl?: string;
 }): Promise<Pattern> {
   const body = createPatternBody({
     description,
+    patternLanguage,
     referenceUrl,
     title,
     iconUrl,
@@ -40,6 +43,7 @@ export async function createPattern({
     ...response,
     title,
     description,
+    patternLanguage: patternLanguage || null,
     patternRef: referenceUrl,
     icon: iconUrl || "",
     mappings: [],
@@ -56,6 +60,7 @@ export function parsePattern(discussion: BaseDiscussion): Pattern {
     ...discussion,
     icon: parsed.icon || "",
     description: parsed.description || "",
+    patternLanguage: parsed.patternLanguage || null,
     patternRef: parsed.patternRef || "",
     mappings: parsed.mappings || [],
   };

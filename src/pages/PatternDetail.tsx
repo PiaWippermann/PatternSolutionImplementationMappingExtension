@@ -59,6 +59,13 @@ const PatternDetail: React.FC<PatternDetailProps> = ({ patternNumber, onClose })
           <div className="separator"></div>
 
           <div className="section">
+            <h2 className="section-title">Pattern Language</h2>
+            <div className="description-text" dangerouslySetInnerHTML={{ __html: patternDetails.patternLanguage || "No pattern language specified." }} />
+          </div>
+
+          <div className="separator"></div>
+
+          <div className="section">
             <h2 className="section-title">Description</h2>
             <div className="description-text" dangerouslySetInnerHTML={{ __html: patternDetails.description || "No description available." }} />
           </div>

@@ -16,6 +16,7 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [patternLanguage, setPatternLanguage] = useState("");
   const [referenceUrl, setReferenceUrl] = useState("");
   const [iconUrl, setIconUrl] = useState("");
 
@@ -41,6 +42,7 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
         categoryId: patternCategoryId,
         title,
         description,
+        patternLanguage: patternLanguage || undefined,
         referenceUrl,
         iconUrl: iconUrl || undefined,
       });
@@ -80,6 +82,7 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter pattern name"
                 required
               />
             </div>
@@ -90,6 +93,18 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
                 className="custom-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe the pattern, its use cases, and benefits..."
+              />
+            </div>
+
+            <div className="input-field-container">
+              <label>Pattern Language:</label>
+              <input
+                className="custom-input"
+                type="text"
+                value={patternLanguage}
+                onChange={(e) => setPatternLanguage(e.target.value)}
+                placeholder="Enter the pattern language"
               />
             </div>
 
@@ -100,6 +115,7 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
                 type="string"
                 value={referenceUrl}
                 onChange={(e) => setReferenceUrl(e.target.value)}
+                placeholder="Enter any reference (URL, book, article, etc.)"
               />
             </div>
 
@@ -110,6 +126,7 @@ const CreatePattern: React.FC<PatternCreationProps> = ({ onClose }) => {
                 type="url"
                 value={iconUrl}
                 onChange={(e) => setIconUrl(e.target.value)}
+                placeholder="https://example.com/icon.png"
               />
             </div>
 

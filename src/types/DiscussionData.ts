@@ -5,6 +5,7 @@ import type { BaseDiscussion, SimpleDiscussion, PageInfo } from "./GitHub";
 export interface Pattern extends BaseDiscussion {
     icon: string;
     description: string;
+    patternLanguage: string | null;
     patternRef: string;
     mappings: number[];
 }

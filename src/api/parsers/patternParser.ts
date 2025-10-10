@@ -10,11 +10,13 @@
 export function parsePatternBody(body: string): {
   icon: string | null;
   description: string | null;
+  patternLanguage: string | null;
   patternRef: string | null;
   mappings: number[];
 } {
   const iconRegex = /!\[.*?\]\((.*?)\)/;
-  const descriptionRegex = /# Description\s+([\s\S]*?)\n\s*#/;
+  const descriptionRegex = /# Description\s+([\s\S]*?)(?=\n#|$)/m;
+  const patternLanguageRegex = /# Pattern Language\s*\n((?:(?!^#)[\s\S])*?)(?=\n#|$)/m;
   const patternRefRegex = /\[.*?\]\((https?:\/\/[^\s)]+)\)/;
 
   const mappingsMatch = body.match(
@@ -31,11 +33,13 @@ export function parsePatternBody(body: string): {
 
   const iconMatch = body.match(iconRegex);
   const descriptionMatch = body.match(descriptionRegex);
+  const patternLanguageMatch = body.match(patternLanguageRegex);
   const patternRefMatch = body.match(patternRefRegex);
 
   return {
     icon: iconMatch ? iconMatch[1].trim() : null,
     description: descriptionMatch ? descriptionMatch[1].trim() : null,
+    patternLanguage: patternLanguageMatch ? patternLanguageMatch[1].trim() : null,
     patternRef: patternRefMatch ? patternRefMatch[1].trim() : null,
     mappings: mappingsMatches,
   };
@@ -46,11 +50,13 @@ export function parsePatternBody(body: string): {
  */
 export function createPatternBody({
   description,
+  patternLanguage,
   referenceUrl,
   title,
   iconUrl,
 }: {
   description: string;
+  patternLanguage?: string;
   referenceUrl: string;
   title: string;
   iconUrl?: string;
@@ -59,7 +65,7 @@ export function createPatternBody({
 ${iconUrl ? `![Alt-Text](${iconUrl})\n\n` : ""}
 # Description
 ${description}
-
+${patternLanguage ? `\n# Pattern Language\n${patternLanguage}\n` : ""}
 # Pattern Reference
 [${title}](${referenceUrl})
 
