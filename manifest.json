@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Pattern Solution Mapping Extension",
+    "name": "Pattern Mapping Extension",
     "version": "1.0",
-    "description": "A Chrome extension for mapping software patterns to solution implementations.",
+    "description": "Browser extension for in-context software pattern augmentation on technology websites.",
     "permissions": [
         "activeTab",
         "storage",

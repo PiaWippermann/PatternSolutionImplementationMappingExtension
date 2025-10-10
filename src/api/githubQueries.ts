@@ -485,7 +485,7 @@ export const getDiscussionDetails = async (discussionNumber: number) => {
     let query = "";
     query = GET_SIMPLE_DISCUSSION_BY_NUMBER_QUERY;
 
-    // 💡 Die Variablen müssen mit den Variablennamen im GraphQL-Query übereinstimmen
+    // 💡 The variables must match the variable names in the GraphQL query
     const variables = {
         discussionNumber,
         repoOwner: owner,

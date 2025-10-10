@@ -104,7 +104,7 @@ export const DiscussionDataProvider: React.FC<{
     // Check if the request has already been made using the cursor as the key
     if (discussionData?.[type].listData[cursor || 'null']) {
       const cachedData = discussionData?.[type].listData[cursor || 'null'];
-      // 💡 Daten über den Callback zurückgeben
+      // 💡 Return data via the callback
       onDataFetched(cachedData);
       return;
     }
@@ -131,7 +131,7 @@ export const DiscussionDataProvider: React.FC<{
           },
         };
       });
-      // 💡 Daten über den Callback zurückgeben, nachdem der State aktualisiert wurde
+      // 💡 Return data via the callback after the state has been updated
       onDataFetched({
         discussions: response.nodes,
         pageInfo: response.pageInfo,

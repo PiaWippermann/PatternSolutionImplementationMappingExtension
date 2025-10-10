@@ -159,7 +159,7 @@ const MappingList: React.FC<MappingListProps> = ({ sourceDiscussion }) => {
         } catch (error) {
             console.error('Failed to load comments:', error);
         } finally {
-            // Setze den Ladezustand für diese Diskussion auf false
+            // Set the loading state for this discussion to false
             setIsLoadingComments(prev => ({ ...prev, [discussionId]: false }));
         }
     };
