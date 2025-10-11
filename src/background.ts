@@ -44,11 +44,14 @@ async function fetchAndParseUrls() {
         }
     });
     await browser.storage.local.set({ relevantUrls: urlMappings });
+    console.log(`Fetched and stored ${urlMappings.length} relevant URLs.`);
+    console.log(urlMappings);
 }
 /**
  * Executes the content script on a specific tab.
  */
 async function executeContentScript(tabId: number, discussionNumber: number) {
+    console.log(`Executing content script on tab ${tabId} for discussion number ${discussionNumber}`);
     try {
         await browser.scripting.executeScript({
             target: { tabId: tabId },
@@ -89,8 +92,8 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         }
         const result = await browser.storage.local.get('relevantUrls') as { relevantUrls: { url: string, discussionNumber: number }[] };
         const relevantUrls = result.relevantUrls || [];
-        const normalizedTabUrl = tab.url.replace(/\/(de|en|jp)\//, '/');
-        const matchingSolution = relevantUrls.find(urlMapping => normalizedTabUrl.startsWith(urlMapping.url));
+
+        const matchingSolution = relevantUrls.find(urlMapping => (tab.url as string).startsWith(urlMapping.url));
         if (matchingSolution) {
             executeContentScript(tabId, matchingSolution.discussionNumber);
         }

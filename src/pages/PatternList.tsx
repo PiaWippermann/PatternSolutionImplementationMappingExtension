@@ -66,7 +66,7 @@ const PatternList: React.FC<PatternListProps> = ({ onSelectPattern, onAddPattern
   } else if (error) {
     content = <p>Fehler beim Laden: {error}</p>;
   } else if (patterns.length === 0) {
-    content = <p>Keine Patterns gefunden.</p>;
+    content = <p>No patterns found.</p>;
   } else {
     content = (
       <ul className="list-content">

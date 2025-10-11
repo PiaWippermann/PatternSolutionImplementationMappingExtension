@@ -24,6 +24,7 @@ async function checkAuth(): Promise<boolean> {
  * Injects the React sidebar component into the page
  */
 export const main = async (solutionImplementationNumber: number) => {
+    console.log('Content script main function called with solutionImplementationNumber:', solutionImplementationNumber);
     // Check if user is authenticated
     const isAuth = await checkAuth();
     if (!isAuth) {
