@@ -129,7 +129,7 @@ const Search: React.FC<SearchProps> = ({ onClose, onDiscussionSelected }) => {
                         className="search-input"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Search for patterns or solutions..."
+                        placeholder="Search for patterns or solutions... (whole words only)"
                     />
                     <button type="submit" className="search-button">
                         <FontAwesomeIcon icon={faMagnifyingGlass} />

@@ -53,7 +53,7 @@ export function PatternSelector({
                 <input
                     type="text"
                     className="search-input"
-                    placeholder="Search patterns..."
+                    placeholder="Search patterns... (whole words only)"
                     value={patternSearchInput}
                     onChange={(e) => onSearchInputChange(e.target.value)}
                     onKeyPress={onSearchKeyPress}
