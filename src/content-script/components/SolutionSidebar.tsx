@@ -108,6 +108,17 @@ export function SolutionSidebar({ solutionImplementationNumber }: SolutionSideba
     const onCreateMapping = async () => {
         if (!selectedPatternOptionDetails || !solutionImplementationDetails) return;
 
+        // Check permissions before creating the mapping
+        if (!selectedPatternOptionDetails.viewerCanUpdate) {
+            alert("You don't have permission to update the pattern discussion. Mapping cannot be created.");
+            return;
+        }
+
+        if (!solutionImplementationDetails.viewerCanUpdate) {
+            alert("You don't have permission to update the solution discussion. Mapping cannot be created.");
+            return;
+        }
+
         try {
             setIsLoadingSolution(true);
 
