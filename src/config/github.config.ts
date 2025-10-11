@@ -13,7 +13,7 @@ export const GITHUB_REPO_OWNER = 'PiaWippermann';
 /**
  * The name of the GitHub repository containing the discussions
  */
-export const GITHUB_REPO_NAME = 'GitHubDiscussionsTesting';
+export const GITHUB_REPO_NAME = 'pattern-mapping-data';
 
 /**
  * The GitHub GraphQL API endpoint

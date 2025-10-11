@@ -39,13 +39,26 @@ const MappingList: React.FC<MappingListProps> = ({ sourceDiscussion }) => {
                 return;
             }
 
-            const fetchPromises = sourceDiscussion.mappings.map(discussionNumber => fetchMappingDiscussionByNumber(discussionNumber));
+            // Use Promise.allSettled instead of Promise.all to handle individual failures
+            const fetchPromises = sourceDiscussion.mappings.map(async (discussionNumber) => {
+                try {
+                    return await fetchMappingDiscussionByNumber(discussionNumber);
+                } catch (error) {
+                    console.error(`Error loading mapping discussion #${discussionNumber}:`, error);
+                    return null;
+                }
+            });
+
             try {
-                const allDiscussions = await Promise.all(fetchPromises);
-                const validDiscussions = allDiscussions.filter(discussion => discussion !== null);
+                const results = await Promise.allSettled(fetchPromises);
+                const validDiscussions = results
+                    .filter(result => result.status === 'fulfilled' && result.value !== null)
+                    .map(result => (result as PromiseFulfilledResult<any>).value);
                 setMappingDiscussions(validDiscussions);
             } catch (error) {
-                console.error('Failed to load mapped discussions:', error);
+                console.error('Error loading linked discussions:', error);
+                // Don't crash, just show empty list
+                setMappingDiscussions([]);
             }
         };
 
@@ -80,26 +93,39 @@ const MappingList: React.FC<MappingListProps> = ({ sourceDiscussion }) => {
             // No existing details, fetch them
             setIsLoadingDetails(true);
 
-            // get the number of the target discussion from the mapping discussion
-            const targetDiscussionNumber = discussion.patternDiscussionNumber == sourceDiscussion.number ? discussion.solutionImplementationDiscussionNumber : discussion.patternDiscussionNumber;
-            // get the category id for the target discussion
-            if (!ids) {
+            try {
+                // get the number of the target discussion from the mapping discussion
+                const targetDiscussionNumber = discussion.patternDiscussionNumber == sourceDiscussion.number ? discussion.solutionImplementationDiscussionNumber : discussion.patternDiscussionNumber;
+                // get the category id for the target discussion
+                if (!ids) {
+                    setIsLoadingDetails(false);
+                    return;
+                }
+                const targetCategoryId = isSourcePattern ? ids.solutionImplementationCategoryId : ids.patternCategoryId;
+
+                const details = await fetchDiscussionDetailsByNumber(targetCategoryId, targetDiscussionNumber);
+
+                // Create a new object to represent the state update
+                setMappingTargetDetails(prevDetails => ({
+                    ...prevDetails,
+                    [discussion.number]: {
+                        isVisible: true,
+                        details
+                    },
+                }));
+            } catch (error) {
+                console.error(`Error loading mapping target details for discussion #${discussion.number}:`, error);
+                // Set details as undefined but still mark as visible so user sees it failed
+                setMappingTargetDetails(prevDetails => ({
+                    ...prevDetails,
+                    [discussion.number]: {
+                        isVisible: true,
+                        details: undefined
+                    },
+                }));
+            } finally {
                 setIsLoadingDetails(false);
-                return;
             }
-            const targetCategoryId = isSourcePattern ? ids.solutionImplementationCategoryId : ids.patternCategoryId;
-
-            const details = await fetchDiscussionDetailsByNumber(targetCategoryId, targetDiscussionNumber);
-            setIsLoadingDetails(false);
-
-            // Create a new object to represent the state update
-            setMappingTargetDetails(prevDetails => ({
-                ...prevDetails,
-                [discussion.number]: {
-                    isVisible: true,
-                    details
-                },
-            }));
         }
     };
 
@@ -205,7 +231,7 @@ const MappingList: React.FC<MappingListProps> = ({ sourceDiscussion }) => {
                                 <div className={styles.linkedDetailsContainer}>
                                     {isLoadingDetails ? (
                                         <LoadingSpinner />
-                                    ) : (
+                                    ) : mappingTargetDetails[discussion?.number]?.details ? (
                                         <>
                                             <div className={styles.linkedTitle}>
                                                 <h3>{mappingTargetDetails[discussion?.number].details?.title}</h3>
@@ -266,6 +292,10 @@ const MappingList: React.FC<MappingListProps> = ({ sourceDiscussion }) => {
                                                 ))}
                                             </ul>
                                         </>
+                                    ) : (
+                                        <div className={styles.errorNote}>
+                                            <p>Failed to load details for this mapping. The linked discussion may have been deleted.</p>
+                                        </div>
                                     )}
                                 </div>
                             )}

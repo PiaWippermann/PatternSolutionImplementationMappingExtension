@@ -98,6 +98,7 @@ function App() {
       case 'solutionImplementationDetail':
         return selectedNumber !== null ? (
           <SolutionImplementationDetail
+            key={selectedNumber}
             solutionImplementationNumber={selectedNumber}
             onClose={() => setCurrentView('solutionsImplementations')}
           />
@@ -107,6 +108,7 @@ function App() {
       case 'patternDetail':
         return selectedNumber !== null ? (
           <PatternDetail
+            key={selectedNumber}
             patternNumber={selectedNumber}
             onClose={() => setCurrentView('patterns')}
           />

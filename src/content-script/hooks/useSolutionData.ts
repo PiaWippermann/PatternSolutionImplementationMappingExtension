@@ -65,19 +65,39 @@ export function useSolutionData(solutionImplementationNumber: number) {
                     return;
                 }
 
-                // Fetch all mappings in parallel
-                const mappingPromises = mappingNumbers.map(mappingNumber => getDiscussionDetails(mappingNumber));
-                const mappingResults = await Promise.all(mappingPromises);
-
-                // Fetch all patterns in parallel
-                const patternPromises = mappingResults.map(mappingDetails => {
-                    const mappingData = mappingDetails ? parseMapping(mappingDetails) : null;
-                    const patternNumber = mappingData?.patternDiscussionNumber;
-                    return patternNumber ? getDiscussionDetails(patternNumber) : Promise.resolve(null);
+                // Fetch all mappings in parallel with error handling
+                const mappingPromises = mappingNumbers.map(async (mappingNumber) => {
+                    try {
+                        return await getDiscussionDetails(mappingNumber);
+                    } catch (error) {
+                        console.error(`Error loading mapping #${mappingNumber}:`, error);
+                        return null;
+                    }
                 });
-                const patternResults = await Promise.all(patternPromises);
 
-                const newMappingDiscussions = mappingResults.filter(Boolean).map((mappingDetails: BaseDiscussion) => {
+                const mappingResultsSettled = await Promise.allSettled(mappingPromises);
+                const mappingResults = mappingResultsSettled
+                    .filter(result => result.status === 'fulfilled' && result.value !== null)
+                    .map(result => (result as PromiseFulfilledResult<BaseDiscussion>).value);
+
+                // Fetch all patterns in parallel with error handling
+                const patternPromises = mappingResults.map(async (mappingDetails: BaseDiscussion) => {
+                    try {
+                        const mappingData = parseMapping(mappingDetails);
+                        const patternNumber = mappingData?.patternDiscussionNumber;
+                        return patternNumber ? await getDiscussionDetails(patternNumber) : null;
+                    } catch (error) {
+                        console.error(`Error loading pattern for mapping #${mappingDetails.number}:`, error);
+                        return null;
+                    }
+                });
+
+                const patternResultsSettled = await Promise.allSettled(patternPromises);
+                const patternResults = patternResultsSettled
+                    .filter(result => result.status === 'fulfilled' && result.value !== null)
+                    .map(result => (result as PromiseFulfilledResult<BaseDiscussion | null>).value);
+
+                const newMappingDiscussions = mappingResults.map((mappingDetails: BaseDiscussion) => {
                     return parseMapping(mappingDetails);
                 });
 
@@ -90,6 +110,12 @@ export function useSolutionData(solutionImplementationNumber: number) {
                         const parsedPattern = parsePattern(patternDetails);
                         newPatternDetails[mappingNumber] = {
                             details: parsedPattern,
+                            isVisible: false,
+                        };
+                    } else {
+                        // Set undefined to indicate error
+                        newPatternDetails[mappingNumber] = {
+                            details: undefined as any,
                             isVisible: false,
                         };
                     }

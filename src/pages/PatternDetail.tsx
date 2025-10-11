@@ -6,6 +6,7 @@ import MappingList from "../components/MappingList";
 import "../styles/pages/DetailPage.scss";
 import type { Pattern } from "../types/DiscussionData";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 
 interface PatternDetailProps {
   patternNumber: number;
@@ -13,28 +14,62 @@ interface PatternDetailProps {
 }
 
 const PatternDetail: React.FC<PatternDetailProps> = ({ patternNumber, onClose }) => {
-  const { loading, error, fetchDiscussionDetailsByNumber, ids } = useDiscussionData();
+  const { fetchDiscussionDetailsByNumber, ids, clearListCache } = useDiscussionData();
 
   const [patternDetails, setPatternDetails] = useState<Pattern | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadDetails = async () => {
       if (patternNumber && ids?.patternCategoryId) {
-        const details = await fetchDiscussionDetailsByNumber(ids.patternCategoryId, patternNumber) as Pattern | null;
+        try {
+          setIsLoading(true);
+          setError(null);
 
-        if (details) {
-          setPatternDetails(details);
+          const details = await fetchDiscussionDetailsByNumber(ids.patternCategoryId, patternNumber) as Pattern | null;
+
+          if (details) {
+            setPatternDetails(details);
+          } else {
+            setError("Pattern not found");
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Failed to load pattern");
+        } finally {
+          setIsLoading(false);
         }
       }
     };
     loadDetails();
+
+    // Cleanup function to reset state when component unmounts
+    return () => {
+      setError(null);
+      setPatternDetails(null);
+      setIsLoading(true);
+    };
   }, [patternNumber, ids, fetchDiscussionDetailsByNumber]);
 
-  const close = () => onClose();
+  const close = () => {
+    // Only clear cache if there was an error (discussion might have been deleted)
+    if (error) {
+      clearListCache('patterns');
+    }
+    onClose();
+  };
 
-  if (loading && !patternDetails) return <LoadingSpinner />;
-  if (error) return <div>Error: {error}</div>;
-  if (!patternDetails) return <p>Details not found.</p>;
+  if (isLoading) return <LoadingSpinner />;
+
+  if (error || !patternDetails) return (
+    <ErrorMessage
+      title={error ? "Error Loading Pattern" : "Pattern Not Found"}
+      message={error
+        ? "The pattern could not be loaded. It may have been deleted or you may not have access to it."
+        : `Pattern #${patternNumber} could not be found. It may have been deleted or you may not have access to it.`}
+      onBack={close}
+    />
+  );
 
   return (
     <div className="detail-panel">

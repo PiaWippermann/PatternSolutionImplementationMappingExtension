@@ -34,6 +34,7 @@ type DiscussionDataContextType = {
   addOrUpdateSolutionImplementationData: (newSolutionImplementation: SolutionImplementation) => void;
   addOrUpdateMappingData: (newMapping: PatternSolutionMapping) => void;
   clearListCache: (type: 'patterns' | 'solutionImplementations') => void;
+  clearAllCache: () => void;
   ids: RepositoryIds;
   loading: boolean;
   error: string | null;
@@ -60,6 +61,7 @@ const DiscussionDataContext = createContext<DiscussionDataContextType>({
   addOrUpdateSolutionImplementationData: () => { },
   addOrUpdateMappingData: () => { },
   clearListCache: () => { },
+  clearAllCache: () => { },
   ids: {
     repositoryId: "",
     solutionImplementationCategoryId: "",
@@ -425,6 +427,24 @@ export const DiscussionDataProvider: React.FC<{
       },
     }));
   };
+
+  // Clear all cached data (lists, details, and mappings)
+  const clearAllCache = () => {
+    setDiscussionData({
+      patterns: {
+        details: [],
+        listData: {},
+        currentPageCursor: null,
+      },
+      solutionImplementations: {
+        details: [],
+        listData: {},
+        currentPageCursor: null,
+      },
+      patternSolutionMappings: [],
+    });
+  };
+
   // fetch repo ids on mount
   useEffect(() => {
     fetchRepoIds();
@@ -432,7 +452,7 @@ export const DiscussionDataProvider: React.FC<{
   return (
     <DiscussionDataContext.Provider
       value={{
-        ids, loading, error, discussionData, fetchDiscussionList, fetchDiscussionDetailsByNumber, fetchMappingDiscussionByNumber, addOrUpdatePatternData, addOrUpdateSolutionImplementationData, addOrUpdateMappingData, clearListCache
+        ids, loading, error, discussionData, fetchDiscussionList, fetchDiscussionDetailsByNumber, fetchMappingDiscussionByNumber, addOrUpdatePatternData, addOrUpdateSolutionImplementationData, addOrUpdateMappingData, clearListCache, clearAllCache
       }}
     >
       {children}

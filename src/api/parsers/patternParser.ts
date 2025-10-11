@@ -15,7 +15,7 @@ export function parsePatternBody(body: string): {
   mappings: number[];
 } {
   const iconRegex = /!\[.*?\]\((.*?)\)/;
-  const descriptionRegex = /# Description\s+([\s\S]*?)(?=\n#|$)/m;
+  const descriptionRegex = /# Description\s*\n((?:(?!^#)[\s\S])*?)(?=\n#|$)/m;
   const patternLanguageRegex = /# Pattern Language\s*\n((?:(?!^#)[\s\S])*?)(?=\n#|$)/m;
   const patternRefRegex = /\[.*?\]\((https?:\/\/[^\s)]+)\)/;
 

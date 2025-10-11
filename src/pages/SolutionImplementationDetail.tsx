@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAnglesLeft } from "@fortawesome/free-solid-svg-icons";
 import MappingList from "../components/MappingList";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import type { SolutionImplementation } from "../types/DiscussionData";
 
 interface SolutionImplementationDetailProps {
@@ -13,30 +14,63 @@ interface SolutionImplementationDetailProps {
 }
 
 const SolutionImplementationDetail: React.FC<SolutionImplementationDetailProps> = ({ solutionImplementationNumber, onClose }) => {
-    // use params to get the pattern number from the URL 
-    const { loading, error, fetchDiscussionDetailsByNumber, ids } = useDiscussionData();
+    const { fetchDiscussionDetailsByNumber, ids, clearListCache } = useDiscussionData();
 
     // State for loaded details
     const [solutionImplementationDetails, setSolutionImplementationDetails] = useState<SolutionImplementation | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const loadDetails = async () => {
             if (solutionImplementationNumber && ids?.solutionImplementationCategoryId) {
-                const details = await fetchDiscussionDetailsByNumber(ids.solutionImplementationCategoryId, solutionImplementationNumber) as SolutionImplementation | null;
+                try {
+                    setIsLoading(true);
+                    setError(null);
 
-                if (details) {
-                    setSolutionImplementationDetails(details);
+                    const details = await fetchDiscussionDetailsByNumber(ids.solutionImplementationCategoryId, solutionImplementationNumber) as SolutionImplementation | null;
+
+                    if (details) {
+                        setSolutionImplementationDetails(details);
+                    } else {
+                        setError("Solution Implementation not found");
+                    }
+                } catch (err) {
+                    setError(err instanceof Error ? err.message : "Failed to load solution implementation");
+                } finally {
+                    setIsLoading(false);
                 }
             }
         };
         loadDetails();
+
+        // Cleanup function to reset state when component unmounts
+        return () => {
+            setError(null);
+            setSolutionImplementationDetails(null);
+            setIsLoading(true);
+        };
     }, [solutionImplementationNumber, ids, fetchDiscussionDetailsByNumber]);
 
-    const close = () => onClose();
+    const close = () => {
+        // Only clear cache if there was an error (discussion might have been deleted)
+        if (error) {
+            clearListCache('solutionImplementations');
+        }
+        onClose();
+    };
 
-    if (loading && !solutionImplementationDetails) return <LoadingSpinner />;
-    if (error) return <div>Error: {error}</div>;
-    if (!solutionImplementationDetails) return <p>Solution implementation not found.</p>;
+    if (isLoading) return <LoadingSpinner />;
+
+    if (error || !solutionImplementationDetails) return (
+        <ErrorMessage
+            title={error ? "Error Loading Solution" : "Solution Not Found"}
+            message={error
+                ? "The solution implementation could not be loaded. It may have been deleted or you may not have access to it."
+                : `Solution Implementation #${solutionImplementationNumber} could not be found. It may have been deleted or you may not have access to it.`}
+            onBack={close}
+        />
+    );
 
 
     return (

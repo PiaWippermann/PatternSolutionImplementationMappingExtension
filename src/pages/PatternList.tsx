@@ -15,7 +15,7 @@ interface PatternListProps {
 }
 
 const PatternList: React.FC<PatternListProps> = ({ onSelectPattern, onAddPattern }) => {
-  const { loading, error, ids, fetchDiscussionList, clearListCache } = useDiscussionData();
+  const { loading, error, ids, fetchDiscussionList, clearAllCache } = useDiscussionData();
 
   const [patterns, setPatterns] = useState<SimpleDiscussion[]>([]);
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
@@ -51,8 +51,8 @@ const PatternList: React.FC<PatternListProps> = ({ onSelectPattern, onAddPattern
   };
 
   const handleRefresh = () => {
-    // Clear the cache
-    clearListCache('patterns');
+    // Clear ALL cache (lists, details, mappings)
+    clearAllCache();
     // Reset pagination to first page
     setPageHistory([null]);
     setCurrentPageIndex(0);

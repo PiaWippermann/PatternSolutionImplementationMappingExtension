@@ -66,50 +66,58 @@ export function MappingListView({
                             </div>
                             {patternDetails[discussion.number]?.isVisible && (
                                 <div className={styles.linkedDetailsContainer}>
-                                    {patternDetails[discussion.number]?.details?.patternLanguage && (
+                                    {patternDetails[discussion.number]?.details ? (
                                         <>
-                                            <div className={styles.patternLanguageSection}>
-                                                <strong>Pattern Language:</strong>{' '}
-                                                <span>{patternDetails[discussion.number]?.details?.patternLanguage}</span>
-                                            </div>
+                                            {patternDetails[discussion.number]?.details?.patternLanguage && (
+                                                <>
+                                                    <div className={styles.patternLanguageSection}>
+                                                        <strong>Pattern Language:</strong>{' '}
+                                                        <span>{patternDetails[discussion.number]?.details?.patternLanguage}</span>
+                                                    </div>
+                                                    <div className={styles.separator}></div>
+                                                </>
+                                            )}
+                                            <p>{patternDetails[discussion.number]?.details?.description}</p>
                                             <div className={styles.separator}></div>
+                                            <h4 className={styles.commentsTitle}>Comments</h4>
+                                            <ul>
+                                                <li>
+                                                    <CommentCreator
+                                                        discussionId={discussion.id}
+                                                        onCommentSubmit={(comment) => onAddComment(discussion.id, comment)}
+                                                    />
+                                                </li>
+                                            </ul>
+                                            {discussion.comments?.pageInfo?.hasNextPage && (
+                                                <button
+                                                    onClick={() => onLoadComments(discussion.id)}
+                                                    className={styles.loadCommentButton}
+                                                    disabled={isLoadingComments[discussion.id]}
+                                                >
+                                                    {isLoadingComments[discussion.id] ? 'Loading...' : 'Load More Comments'}
+                                                </button>
+                                            )}
+                                            {!discussion.comments?.nodes?.length && !isLoadingComments[discussion.id] && (
+                                                <button
+                                                    onClick={() => onLoadComments(discussion.id)}
+                                                    className={styles.loadCommentButton}
+                                                >
+                                                    Load Comments
+                                                </button>
+                                            )}
+                                            <ul className={styles.commentList}>
+                                                {discussion.comments?.nodes?.map((comment) => (
+                                                    <li key={comment.id}>
+                                                        <CommentComponent commentData={comment} />
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </>
+                                    ) : (
+                                        <div className={styles.errorNote}>
+                                            <p>Failed to load pattern details. The pattern may have been deleted.</p>
+                                        </div>
                                     )}
-                                    <p>{patternDetails[discussion.number]?.details?.description}</p>
-                                    <div className={styles.separator}></div>
-                                    <h4 className={styles.commentsTitle}>Comments</h4>
-                                    <ul>
-                                        <li>
-                                            <CommentCreator
-                                                discussionId={discussion.id}
-                                                onCommentSubmit={(comment) => onAddComment(discussion.id, comment)}
-                                            />
-                                        </li>
-                                    </ul>
-                                    {discussion.comments?.pageInfo?.hasNextPage && (
-                                        <button
-                                            onClick={() => onLoadComments(discussion.id)}
-                                            className={styles.loadCommentButton}
-                                            disabled={isLoadingComments[discussion.id]}
-                                        >
-                                            {isLoadingComments[discussion.id] ? 'Loading...' : 'Load More Comments'}
-                                        </button>
-                                    )}
-                                    {!discussion.comments?.nodes?.length && !isLoadingComments[discussion.id] && (
-                                        <button
-                                            onClick={() => onLoadComments(discussion.id)}
-                                            className={styles.loadCommentButton}
-                                        >
-                                            Load Comments
-                                        </button>
-                                    )}
-                                    <ul className={styles.commentList}>
-                                        {discussion.comments?.nodes?.map((comment) => (
-                                            <li key={comment.id}>
-                                                <CommentComponent commentData={comment} />
-                                            </li>
-                                        ))}
-                                    </ul>
                                 </div>
                             )}
                         </li>

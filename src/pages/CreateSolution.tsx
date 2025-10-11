@@ -44,8 +44,8 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
       return;
     }
 
-    if (!title || !description || !solutionsUrl) {
-      alert("Please fill in all required fields.");
+    if (!title) {
+      alert("Title is required.");
       return;
     }
 
@@ -57,7 +57,6 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
         description,
         solutionsUrl,
       });
-      alert("Solution created successfully!");
 
       // Add the solution to the discussion data context
       // This ensures the new solution appears in the list without needing a full refresh
@@ -110,7 +109,6 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the solution implementation..."
-                required
               />
             </div>
 
@@ -121,8 +119,7 @@ const CreateSolution: React.FC<SolutionImplementationCreationProps> = ({ onClose
                 type="string"
                 value={solutionsUrl}
                 onChange={(e) => setSolutionsUrl(e.target.value)}
-                placeholder="Enter any URL or reference (GitHub, documentation, etc.)"
-                required
+                placeholder="Enter any URL or reference"
               />
             </div>
 

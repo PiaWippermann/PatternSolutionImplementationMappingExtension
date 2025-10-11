@@ -13,7 +13,7 @@ export function parseSolutionBody(body: string): {
   mappings: number[];
 } {
   const solutionRefRegex = /\[.*?\]\((https?:\/\/[^\s)]+)\)/;
-  const descriptionRegex = /# Description\s+([\s\S]*?)\n\s*#/;
+  const descriptionRegex = /# Description\s*\n((?:(?!^#)[\s\S])*?)(?=\n#|$)/m;
 
   const patternLinksMatch = body.match(
     /# Patterns\s*((?:.|\n)*?)(?=\n# |\n*$)/
